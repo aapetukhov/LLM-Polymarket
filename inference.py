@@ -11,6 +11,7 @@ from src.utils.io_utils import ROOT_PATH
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
+# TODO: add logic so we can use pretrained LLM
 
 @hydra.main(version_base=None, config_path="src/configs", config_name="inference")
 def main(config):
