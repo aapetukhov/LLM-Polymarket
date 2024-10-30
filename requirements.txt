@@ -12,3 +12,7 @@ hydra-core
 black
 isort
 pre-commit
+
+# gdelt libs
+gdeltdoc
+gdelt 
