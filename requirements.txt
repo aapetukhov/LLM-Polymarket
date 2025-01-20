@@ -1,13 +1,13 @@
 torch==2.2.0
-torchvision==0.17.0
-torchmetrics
+# torchvision==0.17.0
+# torchmetrics
 numpy==1.26.4
 tqdm
 ipykernel
 matplotlib
 pandas
 wandb
-comet_ml
+# comet_ml
 hydra-core
 
 black
@@ -15,16 +15,16 @@ isort
 pre-commit
 
 # gdelt libs
-gdeltdoc
-gdelt 
+# gdeltdoc
+# gdelt 
 
 # dspy
-dspy-ai
-transformers<=4.43.4
-datasets
+# dspy-ai
+# transformers<=4.43.4
+# datasets
 
 # iteration through autocast
-ijson
+# ijson
 
 # parsing links
 newspaper3k
