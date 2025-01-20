@@ -112,3 +112,9 @@ outputs/
 .vscode/
 .idea/
 __MACOSX/
+
+# autocast questions
+autocast_questions.json
+
+# DS_Store
+.DS_Store

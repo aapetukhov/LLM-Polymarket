@@ -3,6 +3,7 @@ torchvision==0.17.0
 torchmetrics
 numpy==1.26.4
 tqdm
+ipykernel
 matplotlib
 pandas
 wandb
@@ -16,3 +17,15 @@ pre-commit
 # gdelt libs
 gdeltdoc
 gdelt 
+
+# dspy
+dspy-ai
+transformers<=4.43.4
+datasets
+
+# iteration through autocast
+ijson
+
+# parsing links
+newspaper3k
+lxml_html_clean
