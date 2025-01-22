@@ -4,10 +4,20 @@ import json
 from datetime import datetime
 
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+}
+
+
 class GDELTRetriever:
-    def __init__(self, save_path="./gdelt_results"):
+    def __init__(
+        self,
+        save_path="./gdelt_results",
+        headers=HEADERS,
+    ):
         self.api_url = "https://api.gdeltproject.org/api/v2/doc/doc"  # base API URL
         self.save_path = save_path
+        self.headers = headers
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
@@ -20,6 +30,7 @@ class GDELTRetriever:
         enddatetime=None,
         format="JSON",
         sort="HybridRel",
+        language="eng",
         **kwargs
     ):
         """
@@ -33,16 +44,18 @@ class GDELTRetriever:
             - format (str): 'JSON', 'CSV', etc. Defaults to 'JSON'.
             - sort (str): Sort by ... (e.g. HybridRel - relevance, DateDesc - by date in descending order,
             ToneDesc - by tone in descending order).
+            - language (str): 'english', 'french', etc.
             - **kwargs: Additional GDELT API parameters.
 
         Returns:
-            dict: Query parameters.
+            dict: Query params.
         """
         params = {
             "query": query,
             "mode": mode,
             "format": format,
-            "sort": sort
+            "sort": sort,
+            "sourcelang": language,
         }
         if timespan:
             params["timespan"] = timespan
@@ -55,13 +68,13 @@ class GDELTRetriever:
 
     def fetch_results(self, params):
         try:
-            response = requests.get(self.api_url, params=params)
+            response = requests.get(self.api_url, params=params, headers=self.headers)
             response.raise_for_status()
             if params.get("format", "JSON").upper() == "JSON":
                 return response.json()
             return response.text
         except requests.exceptions.RequestException as e:
-            print(f"Error fetching: {e}")
+            print(f"Error fetching data: {e}")
             return None
 
     def save_results(
@@ -82,10 +95,10 @@ class GDELTRetriever:
             else:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(data)
-            print(f"Results saved to {file_path}")
+            print(f"Results saved: see {file_path}")
             return file_path
         except IOError as e:
-            print(f"Error saving file: {e}")
+            print(f"Error saving: {e}")
             return None
 
     def retrieve(
@@ -109,7 +122,7 @@ class GDELTRetriever:
             - **kwargs: Additional GDELT API parameters.
 
         Returns:
-            dict or str: Retrieved data.
+            dict or str: retireved data.
         """
         params = self.build_query(query, mode=mode, format=format, **kwargs)
         data = self.fetch_results(params)
