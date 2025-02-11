@@ -33,3 +33,4 @@ lxml_html_clean
 # langchain tools
 langchain
 langgraph
+pydantic
