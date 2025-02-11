@@ -29,3 +29,7 @@ pre-commit
 # parsing links
 newspaper3k
 lxml_html_clean
+
+# langchain tools
+langchain
+langgraph
