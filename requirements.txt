@@ -34,6 +34,9 @@ lxml_html_clean
 langchain
 langgraph
 pydantic
+
+#openai tools
+openai
 langchain-openai
 
 # crawl4ai
