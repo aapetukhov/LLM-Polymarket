@@ -118,3 +118,6 @@ autocast_questions.json
 
 # DS_Store
 .DS_Store
+
+# env settings
+.env
