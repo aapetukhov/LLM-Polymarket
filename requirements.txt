@@ -14,18 +14,6 @@ black
 isort
 pre-commit
 
-# gdelt libs
-# gdeltdoc
-# gdelt 
-
-# dspy
-# dspy-ai
-# transformers<=4.43.4
-# datasets
-
-# iteration through autocast
-# ijson
-
 # parsing links
 newspaper3k
 lxml_html_clean
@@ -42,3 +30,5 @@ langchain-openai
 # crawl4ai
 Crawl4AI
 
+# env setup tools
+python-dotenv
