@@ -1,5 +1,4 @@
 import os
-import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from typing import Optional
@@ -66,9 +65,9 @@ workflow = StateGraph(GraphState)
 workflow.add_node("summarization", summarize)
 workflow.add_node("prediction", predict)
 
-workflow.set_entry_point("summarization")  
-workflow.add_edge("summarization", "prediction")  
-workflow.add_edge("prediction", END)  
+workflow.set_entry_point("summarization")
+workflow.add_edge("summarization", "prediction")
+workflow.add_edge("prediction", END)
 
 graph = workflow.compile()
 
