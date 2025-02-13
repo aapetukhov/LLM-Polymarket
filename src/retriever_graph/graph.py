@@ -11,8 +11,8 @@ class GraphState:
         self.summary = None
         self.classification = None
 
-summarizer = ChatOpenAI(model="gpt-4-turbo", temperature=0)
-classifier = ChatOpenAI(model="gpt-4-turbo", temperature=0)
+summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+classifier = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 def summarize(state):
     prompt = f"""

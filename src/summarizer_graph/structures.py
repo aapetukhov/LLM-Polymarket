@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class NewsInput(BaseModel):
     question: str
     news_text: str
