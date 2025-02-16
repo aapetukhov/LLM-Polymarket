@@ -1,77 +1,85 @@
 import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from typing import Optional
+from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, END
-
+from .models import GraphState, SummaryOutput, PredictionOutput
+from .config import get_settings
 
 load_dotenv()
 
-class GraphState:
-    def __init__(self, question, text):
-        self.question = question
-        self.text = text
-        self.summary = None
-        self.probability = None
+settings = get_settings()
 
-class SummaryOutput(BaseModel):
-    summary: str = Field(description="Краткое резюме текста, содержащее только релевантную информацию для вопроса")
+def create_llm_clients():
+    """Создание клиентов LLM."""
+    summarizer = ChatOpenAI(
+        model=settings.summarizer_model,
+        openai_api_key=settings.openai_api_key,
+        temperature=settings.temperature,
+        max_tokens=settings.max_summary_tokens
+    ).with_structured_output(SummaryOutput)
 
-class PredictionOutput(BaseModel):
-    probability: float = Field(description="Оценённая вероятность события из вопроса в диапазоне [0,1]")
+    predictor = ChatOpenAI(
+        model=settings.predictor_model,
+        openai_api_key=settings.openai_api_key,
+        temperature=settings.temperature,
+        max_tokens=settings.max_prediction_tokens
+    ).with_structured_output(PredictionOutput)
 
+    return summarizer, predictor
 
-summarizer = ChatOpenAI(
-    model="gpt-4o-mini",
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0,
-    max_tokens=150
-).with_structured_output(SummaryOutput)
+summarizer, predictor = create_llm_clients()
 
+def summarize(state_dict: Dict[str, GraphState]) -> Dict[str, GraphState]:
+    """Этап суммаризации текста."""
+    state = state_dict["state"]
+    try:
+        response = summarizer.invoke(
+            f"""Вопрос: "{state.question}"
+            Текст: "{state.text}"
+            
+            Суммаризируй текст, оставляя только информацию, помогающую ответить на вопрос."""
+        )
+        state.summary = response.summary
+        return {"state": state}
+    except Exception as e:
+        raise RuntimeError(f"Summarization failed: {str(e)}")
 
-predictor = ChatOpenAI(
-    model="gpt-4o-mini",
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0,
-    max_tokens=50
-).with_structured_output(PredictionOutput)
+def predict(state_dict: Dict[str, GraphState]) -> Dict[str, GraphState]:
+    """Этап предсказания вероятности."""
+    state = state_dict["state"]
+    try:
+        response = predictor.invoke(
+            f"""Вопрос: "{state.question}"
+            Суммаризованный текст: "{state.summary}"
+            
+            Оцени вероятность того, что событие в вопросе произойдет (0.000 - точно нет, 1.000 - точно да)."""
+        )
+        state.probability = response.probability
+        return {"state": state}
+    except Exception as e:
+        raise RuntimeError(f"Prediction failed: {str(e)}")
 
+def create_graph() -> StateGraph:
+    """Создание и настройка графа обработки."""
+    workflow = StateGraph(GraphState)
+    
+    workflow.add_node("summarization", summarize)
+    workflow.add_node("prediction", predict)
+    
+    workflow.set_entry_point("summarization")
+    workflow.add_edge("summarization", "prediction")
+    workflow.add_edge("prediction", END)
+    
+    return workflow.compile()
 
-def summarize(state: GraphState):
-    response: SummaryOutput = summarizer.invoke(f"""
-    Вопрос: "{state.question}"
-    Текст: "{state.text}"
-
-    Суммаризируй текст, оставляя только информацию, помогающую ответить на вопрос.
-    """)
-    state.summary = response.summary
-    return {"state": state}
-
-
-def predict(state):
-    response = predictor.invoke(f"""
-    Вопрос: "{state.question}"
-    Суммаризованный текст: "{state.summary}"
-
-    Оцени вероятность того, что событие в вопросе произойдет (0.000 - точно нет, 1.000 - точно да).
-    """)
-    state.probability = response.probability
-    return {"state": state}
-
-
-workflow = StateGraph(GraphState)
-
-workflow.add_node("summarization", summarize)
-workflow.add_node("prediction", predict)
-
-workflow.set_entry_point("summarization")
-workflow.add_edge("summarization", "prediction")
-workflow.add_edge("prediction", END)
-
-graph = workflow.compile()
-
-
+def process_text(question: str, text: str) -> GraphState:
+    """Обработка текста через граф."""
+    graph = create_graph()
+    input_state = GraphState(question=question, text=text)
+    result = graph.invoke({"state": input_state})
+    return result["state"]
 
 input_state = GraphState(
     question="Купит ли Илон Маск ТикТок до 15-го апреля 2025 года?",
@@ -83,8 +91,7 @@ input_state = GraphState(
     """
 )
 
+output = process_text(input_state.question, input_state.text)
 
-output = graph.invoke({"state": input_state})
-
-print(f"Суммаризация: {output['state'].summary}")
-print(f"Вероятность события: {output['state'].probability}")
+print(f"Суммаризация: {output.summary}")
+print(f"Вероятность события: {output.probability}")
