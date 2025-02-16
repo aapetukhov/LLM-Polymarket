@@ -22,6 +22,7 @@ lxml_html_clean
 langchain
 langgraph
 pydantic
+pydantic-settings
 
 #openai tools
 openai
