@@ -1,8 +1,11 @@
+import httpx
+from polyamarket.datatypes import SimpleEvent
 
 
+# TODO; add proper init and refactor SimpleEvent to make it more complex
 class Polymarket:
-    def __init__(...):
-        pass
+    def __init__(self, gamma_events_endpoint: str):
+        self.gamma_events_endpoint = gamma_events_endpoint
 
     def get_all_events(self) -> "list[SimpleEvent]":
         events = []
