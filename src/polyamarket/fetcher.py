@@ -3,6 +3,8 @@ from polyamarket.datatypes import SimpleEvent
 
 
 # TODO; add proper init and refactor SimpleEvent to make it more complex
+# TODO: add gamma market client (GammaMarketClient) to fetch markets and events
+
 class Polymarket:
     def __init__(self, gamma_events_endpoint: str):
         self.gamma_events_endpoint = gamma_events_endpoint
