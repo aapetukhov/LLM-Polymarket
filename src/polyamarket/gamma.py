@@ -41,7 +41,7 @@ class GammaMarketClient:
             print("exception while handling object:", market_object)
 
     # Event parser for events nested under a markets api response
-    def parse_nested_event(self, event_object: dict()) -> PolymarketEvent:
+    def parse_nested_event(self, event_object: dict) -> PolymarketEvent:
         print("[parse_nested_event] called with:", event_object)
         try:
             if "tags" in event_object:
@@ -174,7 +174,7 @@ class GammaMarketClient:
             }
         )
 
-    def get_market(self, market_id: int) -> dict():
+    def get_market(self, market_id: int) -> dict:
         url = self.gamma_markets_endpoint + "/" + str(market_id)
         print(url)
         response = httpx.get(url)
