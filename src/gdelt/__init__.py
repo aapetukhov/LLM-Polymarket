@@ -1,1 +1,1 @@
-from .gdelt_parser import GDELTRetriever
+from .retriever import GDELTRetriever
