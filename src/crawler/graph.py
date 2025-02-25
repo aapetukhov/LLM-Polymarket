@@ -1,6 +1,6 @@
 import os
 from langchain_openai import ChatOpenAI
-from retriever import StateGraph, END
+from crawler import StateGraph, END
 
 os.environ["OPENAI_API_KEY"] = "..."
 

@@ -215,10 +215,3 @@ class GammaMarketClient:
         print(url)
         response = httpx.get(url)
         return response.json()
-
-
-if __name__ == "__main__":
-    gamma = GammaMarketClient()
-    market = gamma.get_market("253123")
-    poly = Polymarket()
-    object = poly.map_api_to_market(market)
