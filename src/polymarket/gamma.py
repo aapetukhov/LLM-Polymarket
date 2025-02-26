@@ -71,7 +71,7 @@ class GammaMarketClient:
 
     def get_markets(
         self, querystring_params={}, parse_pydantic=False, local_file_path=None
-    ) -> "list[Market]":
+    ) -> List[Market]:
         if parse_pydantic and local_file_path is not None:
             raise Exception(
                 'Cannot use "parse_pydantic" and "local_file" params simultaneously.'
@@ -96,7 +96,7 @@ class GammaMarketClient:
 
     def get_events(
         self, querystring_params={}, parse_pydantic=False, local_file_path=None
-    ) -> "list[PolymarketEvent]":
+    ) -> List[PolymarketEvent]:
         if parse_pydantic and local_file_path is not None:
             raise Exception(
                 'Cannot use "parse_pydantic" and "local_file" params simultaneously.'
@@ -124,14 +124,23 @@ class GammaMarketClient:
 
         Args:
             querystring_params (dict, optional): Parameters for filtering events:
-            - limit (int): Number of events to return
-            - offset (int): Pagination offset
-            - active (bool): Filter for active events
-            - closed (bool): Filter for closed events  
-            - archived (bool): Filter for archived events
-            - slug (str): Filter by slug
-            - orderBy (str): Sort field (liquidity, volume, createdAt)
-            - orderDirection (str): Sort direction (asc, desc)
+            - `id` (int) - ID of a specific event (can be passed multiple times to select multiple events).
+            - `slug` (str) - Unique event `slug` (can be passed multiple times).
+            - `archived` (bool) - Filter by archived events (`True`/`False`).
+            - `active` (bool) - Filter by active events (`True`/`False`).
+            - `closed` (bool) - Filter by closed events (`True`/`False`).
+            - `liquidity_min` (float) - Minimum liquidity.
+            - `liquidity_max` (float) - Maximum liquidity.
+            - `volume_min` (float) - Minimum trading volume.
+            - `volume_max` (float) - Maximum trading volume.
+            - `start_date_min` (str) - Minimum start date (ISO format: `"YYYY-MM-DD"`).
+            - `start_date_max` (str) - Maximum start date (ISO format).
+            - `end_date_min` (str) - Minimum end date (ISO format).
+            - `end_date_max` (str) - Maximum end date (ISO format).
+            - `tag` (str) - Filter by tag name.
+            - `tag_id` (int) - Filter by tag ID.
+            - `related_tags` (bool) - Includes related tags (requires `tag_id`).
+            - `tag_slug` (str) - Filter by tag `slug`.
             local_file_path (str, optional): File path to save results as JSON
 
         Returns:
@@ -143,7 +152,7 @@ class GammaMarketClient:
 
         binary_events = [
             event for event in events
-            if event.markets and len(event.markets) == 1 and len(event.markets[0].outcomes) == 2
+            if event.markets and len(event.markets) == 1 and event.markets[0] and len(event.markets[0].outcomes) == 2
         ]
 
         # save if file path provided
@@ -153,13 +162,13 @@ class GammaMarketClient:
 
         return binary_events
 
-    def get_all_markets(self, limit=2) -> "list[Market]":
+    def get_all_markets(self, limit=2) -> List[Market]:
         return self.get_markets(querystring_params={"limit": limit})
 
-    def get_all_events(self, limit=2) -> "list[PolymarketEvent]":
+    def get_all_events(self, limit=2) -> List[PolymarketEvent]:
         return self.get_events(querystring_params={"limit": limit})
 
-    def get_current_markets(self, limit=4) -> "list[Market]":
+    def get_current_markets(self, limit=4) -> List[Market]:
         return self.get_markets(
             querystring_params={
                 "active": True,
@@ -169,7 +178,7 @@ class GammaMarketClient:
             }
         )
 
-    def get_all_current_markets(self, limit=100) -> "list[Market]":
+    def get_all_current_markets(self, limit=100) -> List[Market]:
         offset = 0
         all_markets = []
         while True:
@@ -189,7 +198,7 @@ class GammaMarketClient:
 
         return all_markets
 
-    def get_current_events(self, limit=4) -> "list[PolymarketEvent]":
+    def get_current_events(self, limit=4) -> List[PolymarketEvent]:
         return self.get_events(
             querystring_params={
                 "active": True,
@@ -199,7 +208,7 @@ class GammaMarketClient:
             }
         )
 
-    def get_clob_tradable_markets(self, limit=2) -> "list[Market]":
+    def get_clob_tradable_markets(self, limit=2) -> List[Market]:
         return self.get_markets(
             querystring_params={
                 "active": True,

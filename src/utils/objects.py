@@ -12,7 +12,7 @@ class Tag(BaseModel):
 
 
 class PolymarketEvent(BaseModel):
-    id: str
+    id: Optional[str] = None
     title: Optional[str] = None
     slug: Optional[str] = None  # readable url-style desc
     startDate: Optional[str] = None
