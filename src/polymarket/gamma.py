@@ -149,6 +149,7 @@ class GammaMarketClient:
         querystring_params = querystring_params or {}
         # not saving to file here
         events = self.get_events(querystring_params=querystring_params, parse_pydantic=True)
+        events = [event for event in events if event]  # somehow i see nans there :(
 
         binary_events = [
             event for event in events
