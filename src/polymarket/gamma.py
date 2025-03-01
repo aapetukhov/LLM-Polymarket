@@ -58,17 +58,24 @@ class GammaMarketClient:
             print(f"[parse_event] Caught exception: {err}")
             print("\n", event_object)
 
-    def parse_pydantic_event(self, event_object: dict) -> PolymarketEvent:
+    @staticmethod
+    def parse_pydantic_event(event_object: dict) -> PolymarketEvent:
         try:
             if "tags" in event_object:
-                print("tags here", event_object["tags"])
-                tags: list[Tag] = []
-                for tag in event_object["tags"]:
-                    tags.append(Tag(**tag))
-                event_object["tags"] = tags
+                event_object["tags"] = [Tag(**tag) for tag in event_object["tags"]]
+            
+            if "markets" in event_object:
+                event_object["markets"] = [Market.parse_market(market) for market in event_object["markets"]]
+            
+            if len(event_object["markets"]) == 1 and len(event_object["markets"][0].outcomes) == 2:
+                event_object["binary"] = True
+            else:
+                event_object["binary"] = False
+            
             return PolymarketEvent(**event_object)
         except Exception as err:
             print(f"[parse_event] Caught exception: {err}")
+
 
     def get_markets(
         self, querystring_params={}, parse_pydantic=False, local_file_path=None
@@ -152,12 +159,7 @@ class GammaMarketClient:
         querystring_params = querystring_params or {}
         # not saving to file here
         events = self.get_events(querystring_params=querystring_params, parse_pydantic=True)
-        events = [event for event in events if event]  # somehow i see nans there :(
-
-        binary_events = [
-            event for event in events
-            if event.markets and len(event.markets) == 1 and event.markets[0] and len(event.markets[0].outcomes) == 2
-        ]
+        binary_events = [event for event in events if event.binary]  # somehow i see nans there :(
 
         # save if file path provided
         if local_file_path:

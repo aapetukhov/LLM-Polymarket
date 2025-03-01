@@ -5,6 +5,7 @@ from datetime import datetime
 from newspaper import Article
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.chains.llm import LLMChain
 from langchain.output_parsers import CommaSeparatedListOutputParser
 
@@ -23,7 +24,7 @@ def extract_keywords(question: str) -> list:
         template="Extract keywords from the following binary question:\nQuestion: {question}\nKeywords (comma separated):"
     )
     chain = LLMChain(
-        llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=os.getenv("OPENAI_API_KEY")),
+        llm=ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY")),
         prompt=prompt,
         output_parser=CommaSeparatedListOutputParser()
     )
@@ -49,37 +50,69 @@ def summarize_article(text: str) -> str:
         template="Summarize the following article in no more than 50 words:\n{text}\nSummary:"
     )
     chain = LLMChain(
-        llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=os.getenv("OPENAI_API_KEY")),
+        llm=ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY")),
         prompt=prompt
     )
     return chain.run({"text": text}).strip()
 
 
-def get_event_probability(summaries: list) -> float:
+def get_event_probability(question: str, description: str, summaries: list) -> float:
     combined = "\n".join(summaries)
-    prompt = PromptTemplate(
-        input_variables=["summaries"],
-        template="Based on the following news summaries, provide a probability between 0 and 1 that the event will occur:\n{summaries}\nProbability:"
+    schema = ResponseSchema(
+        name="probability",
+        description="Probability as a number between 0.0 and 1.0"
     )
+    parser = StructuredOutputParser.from_response_schemas([schema])
+    format_instructions = parser.get_format_instructions()
+    
+    prompt = PromptTemplate(
+        input_variables=["question", "description", "summaries", "format_instructions"],
+        template=(
+            "Event question: {question}\n"
+            "Description: {description}\n"
+            "News summaries:\n{summaries}\n"
+            "Based on the above, provide a probability between 0 and 1 that the event will occur. "
+            "Your answer must be valid JSON and follow these instructions:\n"
+            "{format_instructions}"
+        )
+    )
+    
     chain = LLMChain(
         llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=os.getenv("OPENAI_API_KEY")),
-        prompt=prompt
+        prompt=prompt,
+        output_parser=parser
     )
-    prob_str = chain.run({"summaries": combined}).strip()
-    try:
-        return float(prob_str)
-    except Exception:
-        return 0.0
+    
+    result = chain.invoke({
+        "question": question,
+        "description": description,
+        "summaries": combined,
+        "format_instructions": format_instructions
+    })
+    
+    return float(result["probability"])
 
 
 def date_for_gdelt(date: str) -> str:
-    dt = datetime.strptime(date, "%Y-%m-%d")
-    return dt.strftime("%Y%m%d%H%M%S")
+    formats = [
+        "%Y-%m-%dT%H:%M:%S.%fZ",
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%d"
+    ]
+    
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date, fmt)
+            return dt.strftime("%Y%m%d%H%M%S")
+        except ValueError:
+            continue
+    
+    raise ValueError(f"Unknown date format: {date}")
 
 
 def main():
-    start_date_min = "2024-06-01"
-    end_date_max = "2024-12-01"
+    start_date_min = "2024-07-18"
+    end_date_max = "2024-12-31"
     gamma = GammaMarketClient()
 
     if start_date_min and end_date_max:
@@ -109,27 +142,32 @@ def main():
 
     # maybe analyze several events at a time ?
     event = events[0]
-    question = event.get("title", "No question found here")
+    question = event.title
+    description = event.markets[0].description
+    
+    event_start_date = event.startDate or start_date_min
+    event_end_date = event.endDate or end_date_max
+
 
     keywords = extract_keywords(question)
     if not keywords:
         print("No keywords extracted.")
         return
 
-    gdelt = GDELTRetriever()
+    gdelt = GDELTRetriever(save_path=f"data/gdelt/{event.slug}")
     query = " OR ".join(keywords)
     print("QUERY:", query)
     gdelt_data = gdelt.retrieve(
-        query,
+        f"({query})" if len(keywords) > 1 else query,
         mode="ArtList",
-        startdatetime=date_for_gdelt(start_date_min),
-        enddatetime=date_for_gdelt(end_date_max),
+        startdatetime=date_for_gdelt(event_start_date),
+        enddatetime=date_for_gdelt(event_end_date),
         language="eng"
     )
 
     if not gdelt_data:
         print("No news found.")
-        return
+        return get_event_probability([description])
 
     links = extract_article_links(gdelt_data)[:10]
     if not links:
