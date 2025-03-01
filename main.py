@@ -24,10 +24,11 @@ def extract_keywords(question: str) -> list:
     )
     chain = LLMChain(
         llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=os.getenv("OPENAI_API_KEY")),
-        prompt=prompt
+        prompt=prompt,
+        output_parser=CommaSeparatedListOutputParser()
     )
-    keywords_str = chain.run({"question": question})
-    return [kw.strip() for kw in keywords_str.split(",") if kw.strip()]
+    keywords = chain.run({"question": question})
+    return keywords
 
 def extract_article_links(gdelt_data: dict) -> list:
     return [article.get("url") for article in gdelt_data.get("articles", []) if article.get("url")]
@@ -70,15 +71,45 @@ def get_event_probability(summaries: list) -> float:
     except Exception:
         return 0.0
 
+
+def date_for_gdelt(date: str) -> str:
+    dt = datetime.strptime(date, "%Y-%m-%d")
+    return dt.strftime("%Y%m%d%H%M%S")
+
+
 def main():
+    start_date_min = "2024-06-01"
+    end_date_max = "2024-12-01"
     gamma = GammaMarketClient()
-    events = gamma.get_events(querystring_params={"start_date_min": "2022-01-01", "end_date_max": "2022-12-31"})
-    print("NUM_EVENTS:", len(events), '\n')
+
+    if start_date_min and end_date_max:
+        local_file_path = f"data/polymarket/events_{start_date_min}_to_{end_date_max}.json"
+    else:
+        local_file_path = ""
+
+    events = gamma.get_binary_events(
+        querystring_params=
+        {
+            "start_date_min": start_date_min,
+            "end_date_max": end_date_max,
+            "active": False,
+            "archived": True,
+            "tag": "politics"
+         },
+        local_file_path=local_file_path
+    )
+
+    message = f"NUM_EVENTS: {len(events)}"
+    separator = "-" * len(message)
+    print(f"{separator}\n{message}\n{separator}")
+
     if not events:
         print("No binary events found.")
         return
+
+    # maybe analyze several events at a time ?
     event = events[0]
-    question = event.get("title", "Default binary question")
+    question = event.get("title", "No question found here")
 
     keywords = extract_keywords(question)
     if not keywords:
@@ -88,7 +119,14 @@ def main():
     gdelt = GDELTRetriever()
     query = " OR ".join(keywords)
     print("QUERY:", query)
-    gdelt_data = gdelt.retrieve(query, mode="ArtList", timespan="7d")
+    gdelt_data = gdelt.retrieve(
+        query,
+        mode="ArtList",
+        startdatetime=date_for_gdelt(start_date_min),
+        enddatetime=date_for_gdelt(end_date_max),
+        language="eng"
+    )
+
     if not gdelt_data:
         print("No news found.")
         return
