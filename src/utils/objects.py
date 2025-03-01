@@ -1,29 +1,6 @@
+import json
 from typing import Optional, Union, List
 from pydantic import BaseModel
-
-
-class Tag(BaseModel):
-    id: str
-    label: Optional[str] = None
-    slug: Optional[str] = None
-    forceShow: Optional[bool] = None  # missing from current events data
-    createdAt: Optional[str] = None  # missing from events data
-    updatedAt: Optional[str] = None  # missing from current events data
-
-
-class PolymarketEvent(BaseModel):
-    id: Optional[str] = None
-    title: Optional[str] = None
-    slug: Optional[str] = None  # readable url-style desc
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
-    active: Optional[bool] = None
-    archived: Optional[bool] = None
-    closed: Optional[bool] = None
-    liquidity: Optional[float] = None
-    volume: Optional[float] = None
-    markets: Optional[List[str]] = None
-    tags: Optional[List[Tag]] = None # e.g. "Politics", "Sports", "Crypto"
 
 
 class ClobReward(BaseModel):
@@ -36,21 +13,51 @@ class ClobReward(BaseModel):
     endDate: str  # yyyy-mm-dd formatted date string
 
 
+class Tag(BaseModel):
+    id: str
+    label: str
+    slug: str
+
+
 class Market(BaseModel):
-    id: int
-    question: Optional[str] = None
+    id: str
+    question: str
+    conditionId: str
+    slug: str
+    resolutionSource: Optional[str] = None
+    endDate: Optional[str] = None
+    startDate: Optional[str] = None
+    image: Optional[str] = None
+    icon: Optional[str] = None
+    description: Optional[str] = None
+    outcomes: List[str]
+    outcomePrices: List[float]
+    volume: Optional[float] = None
+    active: bool
+    closed: bool
+
+    @classmethod
+    def parse_market(cls, market: dict):
+        market["outcomes"] = json.loads(market["outcomes"]) if isinstance(market["outcomes"], str) else market["outcomes"]
+        market["outcomePrices"] = [float(x) for x in json.loads(market["outcomePrices"])] if isinstance(market["outcomePrices"], str) else market["outcomePrices"]
+        return cls(**market)
+
+
+class PolymarketEvent(BaseModel):
+    id: Optional[str] = None
+    title: Optional[str] = None
     slug: Optional[str] = None
     startDate: Optional[str] = None
     endDate: Optional[str] = None
     active: Optional[bool] = None
-    closed: Optional[bool] = None
     archived: Optional[bool] = None
+    closed: Optional[bool] = None
     liquidity: Optional[float] = None
     volume: Optional[float] = None
-    outcomePrices: Optional[List[float]] = None
-    events: Optional[List[PolymarketEvent]] = None
-    clobRewards: Optional[List[ClobReward]] = None
-    enableOrderBook: Optional[bool] = None
+    markets: Optional[List[Market]] = None
+    tags: Optional[List[Tag]] = None
+    binary: Optional[bool] = None
+
 
 
 class SimpleEvent(BaseModel):

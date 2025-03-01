@@ -12,7 +12,7 @@ HEADERS = {
 class GDELTRetriever:
     def __init__(
         self,
-        save_path="./gdelt_results",
+        save_path="data/gdelt",
         headers=HEADERS,
     ):
         self.api_url = "https://api.gdeltproject.org/api/v2/doc/doc"  # base API URL
