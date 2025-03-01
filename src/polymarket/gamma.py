@@ -1,5 +1,6 @@
 import httpx
 import json
+import os
 from typing import List, Optional, Union
 
 from src.polymarket.polymarket import Polymarket
@@ -118,7 +119,9 @@ class GammaMarketClient:
         else:
             raise Exception()
 
-    def get_binary_events(self, querystring_params=None, local_file_path=None) -> List[PolymarketEvent]:
+    def get_binary_events(
+            self, querystring_params=None, local_file_path=None
+    ) -> List[PolymarketEvent]:
         """
         Fetches binary events - events with a single market that has two outcomes.
 
@@ -158,6 +161,8 @@ class GammaMarketClient:
 
         # save if file path provided
         if local_file_path:
+
+            os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
             with open(local_file_path, "w", encoding="utf-8") as f:
                 json.dump([e.model_dump() for e in binary_events], f, ensure_ascii=False, indent=4)
 

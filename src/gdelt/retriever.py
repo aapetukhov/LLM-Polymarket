@@ -44,7 +44,7 @@ class GDELTRetriever:
             - format (str): 'JSON', 'CSV', etc. Defaults to 'JSON'.
             - sort (str): Sort by ... (e.g. HybridRel - relevance, DateDesc - by date in descending order,
             ToneDesc - by tone in descending order).
-            - language (str): 'english', 'french', etc.
+            - language (str): 'eng', 'fra', etc.
             - **kwargs: Additional GDELT API parameters.
 
         Returns:
