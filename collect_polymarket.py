@@ -7,16 +7,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_date_ranges(start_date: str, end_date: str, span_size: int):
+def get_date_ranges(start_date: str, end_date: str, step_days: int = 5, window_size: int = 6):
     date_ranges = []
     current_start = datetime.strptime(start_date, "%Y-%m-%d")
     end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
-    
+
     while current_start < end_date_dt:
-        current_end = min(current_start + timedelta(days=span_size - 1), end_date_dt)
+        current_end = min(current_start + timedelta(days=window_size - 1), end_date_dt)
         date_ranges.append((current_start.strftime("%Y-%m-%d"), current_end.strftime("%Y-%m-%d")))
-        current_start += timedelta(days=span_size)
-    
+        current_start += timedelta(days=step_days)
+
     return date_ranges
 
 
