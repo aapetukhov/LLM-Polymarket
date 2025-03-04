@@ -79,6 +79,7 @@ class GammaMarketClient:
             return PolymarketEvent(**event_object)
         except Exception as err:
             print(f"[parse_event] Caught exception: {err}")
+            print("\n", "Exception while handling object:", event_object)
 
 
     def get_markets(

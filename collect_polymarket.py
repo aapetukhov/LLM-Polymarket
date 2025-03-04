@@ -73,7 +73,7 @@ def main():
         for event in events:
             unique_events.add(event.id)
         print(f"Fetched {len(events)} events for {start} to {end}")
-        print(f"Unique events: {len(unique_events)}")
+    print(f"Unique events: {len(unique_events)}")
 
 
 if __name__ == "__main__":
