@@ -1,3 +1,13 @@
+"""
+This script collects binary events from Polymarket by parsing them from a specified date range.
+The specified date range is covered by a sliding window.
+Functions:
+    get_date_ranges(start_date: str, end_date: str, step_days: int = 5, window_size: int = 6) -> list:
+        Generates a list of date ranges within the specified start and end dates using a sliding window.
+    main():
+        Main function that initializes the date ranges, fetches binary events from Polymarket, and prints the number of unique events
+        obtained after fetching.
+"""
 from datetime import datetime, timedelta
 from newspaper import Article
 from src.polymarket.gamma import GammaMarketClient
@@ -18,38 +28,6 @@ def get_date_ranges(start_date: str, end_date: str, step_days: int = 5, window_s
         current_start += timedelta(days=step_days)
 
     return date_ranges
-
-
-def extract_article_links(gdelt_data: dict) -> list:
-    return [article.get("url") for article in gdelt_data.get("articles", []) if article.get("url")]
-
-
-def parse_article(link: str) -> str:
-    try:
-        article = Article(link, language="en")
-        article.download()
-        article.parse()
-        return article.text
-    except Exception:
-        return ""
-
-
-def date_for_gdelt(date: str) -> str:
-    formats = [
-        "%Y-%m-%dT%H:%M:%S.%fZ",
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%d"
-    ]
-
-    for fmt in formats:
-        try:
-            dt = datetime.strptime(date, fmt)
-            return dt.strftime("%Y%m%d%H%M%S")
-        except ValueError:
-            continue
-
-    raise ValueError(f"Unknown date format: {date}")
-
 
 def main():
     min_date = "2024-01-01"
