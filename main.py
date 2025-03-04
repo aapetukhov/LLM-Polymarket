@@ -140,7 +140,7 @@ def main():
         print("No binary events found.")
         return
 
-    # maybe analyze several events at a time ?
+    # TODO: analyze several events at a time
     event = events[0]
     question = event.title
     description = event.markets[0].description
