@@ -10,9 +10,9 @@ pandas
 # comet_ml
 # hydra-core
 
-black
-isort
-pre-commit
+# black
+# isort
+# pre-commit
 
 # parsing links
 newspaper3k
