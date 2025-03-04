@@ -65,9 +65,8 @@ def main():
             querystring_params={
                 "limit": 1000,
                 "start_date_min": start,
-                "end_date_max": end,
+                "start_date_max": end,
                 "active": False,
-                "archived": True,
             },
             local_file_path=file_path
         )
