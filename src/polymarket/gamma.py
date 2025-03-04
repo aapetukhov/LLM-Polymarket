@@ -63,9 +63,13 @@ class GammaMarketClient:
         try:
             if "tags" in event_object:
                 event_object["tags"] = [Tag(**tag) for tag in event_object["tags"]]
+            else:
+                event_object["tags"] = []
             
             if "markets" in event_object:
                 event_object["markets"] = [Market.parse_market(market) for market in event_object["markets"]]
+            else:
+                event_object["markets"] = []
             
             if len(event_object["markets"]) == 1 and len(event_object["markets"][0].outcomes) == 2:
                 event_object["binary"] = True
@@ -134,6 +138,7 @@ class GammaMarketClient:
 
         Args:
             querystring_params (dict, optional): Parameters for filtering events:
+            - `limit` (int) - Number of events to return.
             - `id` (int) - ID of a specific event (can be passed multiple times to select multiple events).
             - `slug` (str) - Unique event `slug` (can be passed multiple times).
             - `archived` (bool) - Filter by archived events (`True`/`False`).

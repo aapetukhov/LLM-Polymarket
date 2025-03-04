@@ -121,3 +121,6 @@ autocast_questions.json
 
 # env settings
 .env
+
+# tests
+test_polymarket.py
