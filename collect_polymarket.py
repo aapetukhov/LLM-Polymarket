@@ -7,15 +7,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_weekly_date_ranges(start_date: str, end_date: str):
+def get_date_ranges(start_date: str, end_date: str, span_size: int):
     date_ranges = []
     current_start = datetime.strptime(start_date, "%Y-%m-%d")
     end_date_dt = datetime.strptime(end_date, "%Y-%m-%d")
     
     while current_start < end_date_dt:
-        current_end = min(current_start + timedelta(days=6), end_date_dt)
+        current_end = min(current_start + timedelta(days=span_size - 1), end_date_dt)
         date_ranges.append((current_start.strftime("%Y-%m-%d"), current_end.strftime("%Y-%m-%d")))
-        current_start += timedelta(days=7)
+        current_start += timedelta(days=span_size)
     
     return date_ranges
 
@@ -54,7 +54,7 @@ def date_for_gdelt(date: str) -> str:
 def main():
     start_date_min = "2024-07-18"
     end_date_max = "2024-07-31"
-    date_ranges = get_weekly_date_ranges(start_date_min, end_date_max)
+    date_ranges = get_date_ranges(start_date_min, end_date_max, span_size=7)
     gamma = GammaMarketClient()
 
     for start, end in date_ranges:
