@@ -6,9 +6,9 @@ tqdm
 ipykernel
 matplotlib
 pandas
-wandb
+# wandb
 # comet_ml
-hydra-core
+# hydra-core
 
 black
 isort
