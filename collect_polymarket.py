@@ -52,17 +52,18 @@ def date_for_gdelt(date: str) -> str:
 
 
 def main():
-    start_date_min = "2024-07-18"
-    end_date_max = "2024-07-31"
-    date_ranges = get_date_ranges(start_date_min, end_date_max, span_size=7)
+    min_date = "2024-01-01"
+    max_date = "2025-02-25"
+    date_ranges = get_date_ranges(min_date, max_date, 5, 6)
     gamma = GammaMarketClient()
+    unique_events = set()
 
     for start, end in date_ranges:
         file_path = f"data/polymarket/events_{start}_to_{end}.json"
         
         events = gamma.get_binary_events(
             querystring_params={
-                "limit": 200,
+                "limit": 1000,
                 "start_date_min": start,
                 "end_date_max": end,
                 "active": False,
@@ -70,8 +71,11 @@ def main():
             },
             local_file_path=file_path
         )
-        
+        for event in events:
+            unique_events.add(event.id)
         print(f"Fetched {len(events)} events for {start} to {end}")
+        print(f"Unique events: {len(unique_events)}")
+
 
 if __name__ == "__main__":
     main()
