@@ -40,14 +40,14 @@ def date_for_gdelt(date: str) -> str:
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%d"
     ]
-    
+
     for fmt in formats:
         try:
             dt = datetime.strptime(date, fmt)
             return dt.strftime("%Y%m%d%H%M%S")
         except ValueError:
             continue
-    
+
     raise ValueError(f"Unknown date format: {date}")
 
 

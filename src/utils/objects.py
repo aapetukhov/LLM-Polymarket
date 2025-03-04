@@ -38,8 +38,14 @@ class Market(BaseModel):
 
     @classmethod
     def parse_market(cls, market: dict):
-        market["outcomes"] = json.loads(market["outcomes"]) if isinstance(market["outcomes"], str) else market["outcomes"]
-        market["outcomePrices"] = [float(x) for x in json.loads(market["outcomePrices"])] if isinstance(market["outcomePrices"], str) else market["outcomePrices"]
+        if "outcomes" in market:
+            market["outcomes"] = json.loads(market["outcomes"]) if isinstance(market["outcomes"], str) else market["outcomes"]
+        else:
+            market["outcomes"] = []
+        if "outcomePrices" in market:
+            market["outcomePrices"] = [float(x) for x in json.loads(market["outcomePrices"])] if isinstance(market["outcomePrices"], str) else market["outcomePrices"]
+        else:
+            market["outcomePrices"] = []
         return cls(**market)
 
 
