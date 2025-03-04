@@ -42,6 +42,7 @@ class Market(BaseModel):
             market["outcomes"] = json.loads(market["outcomes"]) if isinstance(market["outcomes"], str) else market["outcomes"]
         else:
             market["outcomes"] = []
+
         if "outcomePrices" in market:
             market["outcomePrices"] = [float(x) for x in json.loads(market["outcomePrices"])] if isinstance(market["outcomePrices"], str) else market["outcomePrices"]
         else:
