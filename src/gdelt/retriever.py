@@ -138,8 +138,9 @@ class GDELTRetriever:
         enddatetime,
         mode="ArtList",
         format="JSON",
+        language="eng"
     ):
-        params = self.build_query(query, startdatetime, enddatetime)
+        params = self.build_query(query, mode=mode, startdatetime=startdatetime, enddatetime=enddatetime, language=language)
         data = self.fetch_results(params)
         if not data:
             return []

@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import requests
 from datetime import datetime
@@ -43,7 +44,18 @@ def date_for_gdelt(date):
 def extract_keywords(question: str) -> list:
     prompt = PromptTemplate(
         input_variables=["question"],
-        template="Extract keywords from the following binary question:\nQuestion: {question}\nKeywords (comma separated):"
+        template=(
+            "Extract optimized keywords from the following binary question for querying the GDELT dataset.\n"
+            "Your goal is to find relevant news articles. Follow these rules:\n"
+            "- Remove stop-words (like 'the', 'to', 'of').\n"
+            "- Expand abbreviations (e.g., 'AI' should be 'Artificial Intelligence', 'USA' should be 'United States').\n"
+            "- If a keyword contains a hyphen (`-`), wrap it in double quotes (e.g., 'Ko Wen-je' should be '\"Ko Wen-je\"').\n"
+            "- If a keyword is a multi-word phrase, wrap it in double quotes (e.g., 'Taiwan election' should be '\"Taiwan Election\"').\n"
+            "- Avoid generic words (e.g., 'event', 'question').\n"
+            "- Return a comma-separated list.\n\n"
+            "Question: {question}\n"
+            "Optimized Keywords (comma separated):"
+        )
     )
     chain = LLMChain(
         llm=ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY")),
@@ -52,6 +64,18 @@ def extract_keywords(question: str) -> list:
     )
     keywords = chain.run({"question": question})
     return keywords
+
+
+def format_query(keywords):
+    formatted_keywords = []
+    
+    for word in keywords:
+        if re.search(r"[-\s&|!()]", word):
+            formatted_keywords.append(f'"{word}"')
+        else:
+            formatted_keywords.append(word)
+    
+    return f'({" OR ".join(formatted_keywords)})' if len(formatted_keywords) > 1 else formatted_keywords[0]
 
 
 def process_events(json_path, save_path="data/news_results.json"):
@@ -77,15 +101,23 @@ def process_events(json_path, save_path="data/news_results.json"):
 
         print(f"Processing event {event_id}: {title} | Query: {query}")
 
-        articles_metadata = gdelt.retrieve_articles(query, start_date, end_date)
+        articles_metadata = gdelt.retrieve(
+            format_query(keywords),
+            mode="ArtList",
+            startdatetime=start_date,
+            enddatetime=end_date,
+            language="eng",
+            save_to_file=False
+        )
+
         articles = [
             {
                 "url": article["url"],
                 "title": article["title"],
-                "date": article["date"],
+                "date": article["seendate"],
                 "text": parse_article(article["url"])
             }
-            for article in articles_metadata
+            for article in articles_metadata["articles"]
         ]
 
         results.append({
@@ -105,6 +137,6 @@ def process_events(json_path, save_path="data/news_results.json"):
 
 if __name__ == "__main__":
     process_events(
-        json_path="data/polymarket/events_2024-01-01_to_2024-01-05.json",
-        save_path="data/gdelt/testing.json"
+        json_path="/Users/andreypetukhov/Documents/Thesis/LLM-Polymarket/data/polymarket/sample.json",
+        save_path="/Users/andreypetukhov/Documents/Thesis/LLM-Polymarket/data/gdelt/testing.json"
     )
