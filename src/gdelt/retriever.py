@@ -106,6 +106,7 @@ class GDELTRetriever:
         query,
         mode="ArtList",
         format="JSON",
+        save_to_file=True,
         **kwargs,
     ):
         """
@@ -126,6 +127,38 @@ class GDELTRetriever:
         """
         params = self.build_query(query, mode=mode, format=format, **kwargs)
         data = self.fetch_results(params)
-        if data:
+        if data and save_to_file:
             self.save_results(data, query, format)
         return data
+    
+    def retrieve_articles(
+        self,
+        query,
+        startdatetime,
+        enddatetime,
+        mode="ArtList",
+        format="JSON",
+    ):
+        params = self.build_query(query, startdatetime, enddatetime)
+        data = self.fetch_results(params)
+        if not data:
+            return []
+
+        articles = []
+        for article in data.get("articles", [])[:20]:
+            articles.append({
+                "url": article.get("url"),
+                "title": article.get("title", "No title"),
+                "date": self.format_seendate(article.get("seendate"))
+            })
+        return articles
+    
+    @staticmethod
+    def format_seendate(seendate):
+        """Convert "YYYYMMDDTHHMMSSZ" to format YYYY-MM-DD HH:MM:SS."""
+        if not seendate:
+            return None
+        try:
+            return datetime.strptime(seendate, "%Y%m%dT%H%M%SZ").strftime("%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return None
