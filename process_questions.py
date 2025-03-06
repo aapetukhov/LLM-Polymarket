@@ -18,7 +18,7 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-
+# TODO: DEBUG PIPELINE
 def summarize_article(text: str) -> str:
     prompt = PromptTemplate(
         input_variables=["text"],
@@ -65,7 +65,7 @@ def get_event_probability(question: str, description: str, summaries: list) -> f
         "summaries": combined,
         "format_instructions": format_instructions
     })
-
+    # TODO: debug error with typing in debugger
     return float(result["probability"])
 
 
