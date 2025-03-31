@@ -137,6 +137,6 @@ def process_events(json_path, save_path="data/news_results.json"):
 
 if __name__ == "__main__":
     process_events(
-        json_path="/Users/andreypetukhov/Documents/Thesis/LLM-Polymarket/data/polymarket/sample.json",
-        save_path="/Users/andreypetukhov/Documents/Thesis/LLM-Polymarket/data/gdelt/testing.json"
+        json_path="data/polymarket/sample.json",
+        save_path="data/gdelt/testing.json"
     )
