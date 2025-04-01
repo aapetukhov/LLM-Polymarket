@@ -105,7 +105,9 @@ def format_query(keywords):
     formatted_keywords = []
     
     for word in keywords:
-        if re.search(r"[-\s&|!()]", word):
+        # if re.search(r"[-\s&|!().]", word):
+        #     formatted_keywords.append(f'"{word}"')
+        if not re.fullmatch(r"\w+", word):
             formatted_keywords.append(f'"{word}"')
         else:
             formatted_keywords.append(word)
