@@ -71,9 +71,8 @@ def extract_keywords(title: str, description: str) -> list:
             "- Include only terms likely to appear in news coverage.\n"
             "- Include synonyms or aliases if relevant.\n"
             '- Expand abbreviations (e.g., "AI" should be "Artificial Intelligence", "USA" should be "United States").\n'
-            '- If a keyword contains a hyphen (-), wrap it in double quotes (e.g., "Ko Wen-je").\n'
-            '- If a keyword is a multi-word phrase, wrap it in double quotes (e.g., "Taiwan election").\n'
-            "- Avoid dates and overly generic or technical terms not used in news headlines (e.g., 'market resolution', 'social media').\n"
+            '- If a word contains special characters (such as hyphens, dots, or spaces), wrap it in double quotes (e.g., "Ko Wen-je", "Pump.fun", "Taiwan election")\n'
+            "- Avoid dates, generic terms, or overly technical terms not used in news headlines (e.g., 'market resolution', 'social media').\n"
             "- Return a comma-separated list of optimized keywords.\n\n"
             "Title: {title}\n"
             "Description: {description}\n\n"
