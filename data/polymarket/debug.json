@@ -1,28 +1,28 @@
 
 [
     {
-        "id": "15173",
-        "title": "Will BitBoy knockout Ansem?",
-        "slug": "will-bitboy-knockout-ansem",
-        "startDate": "2024-12-06T16:01:30.350157Z",
-        "endDate": "2024-12-06T12:00:00Z",
+        "id": "15183",
+        "title": "Pump.fun banned in the US before 2025?",
+        "slug": "pumpfun-banned-in-the-us-before-2025",
+        "startDate": "2024-12-06T18:33:29.841729Z",
+        "endDate": "2024-12-31T12:00:00Z",
         "active": true,
         "archived": false,
         "closed": true,
         "liquidity": null,
-        "volume": 5151.444259,
+        "volume": 37173.786031,
         "markets": [
           {
-            "id": "514924",
-            "question": "Will BitBoy knockout Ansem?",
-            "conditionId": "0xd30b62a10d9879f2555900a8947dd1ab2dd17ba369a91fa356189aaf8783b17a",
-            "slug": "will-bitboy-knockout-ansem",
+            "id": "514952",
+            "question": "Pump.fun banned in the US before 2025?",
+            "conditionId": "0x2dfdcea26676118a7494660e2a8f122b7e2cad026c7a1785c86a9c3924e4358d",
+            "slug": "pumpfun-banned-in-the-us-before-2025",
             "resolutionSource": "",
-            "endDate": "2024-12-06T12:00:00Z",
-            "startDate": "2024-12-06T15:59:38.771Z",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-bitboy-knockout-ansem-3eQ5TfeLkzo9.png",
-            "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-bitboy-knockout-ansem-3eQ5TfeLkzo9.png",
-            "description": "Ansem (@blknoiz06) is scheduled to fight Ben Armstrong a.k.a. \"BitBoy\" (@BenArmstrongsX) on December 6, 2024 in Dubai. You can view this post to learn more: https://x.com/CryptoFightWeek/status/1836756340649435639\n\nThis market will resolve to \"Yes\" if Bitboy wins this fight by Knockout or TKO. Otherwise, this market will resolve to \u201cNo\u201d.\n\nIf this fight is canceled permanently, or is moved to a date after December 31, 2024, 11:59 PM ET, this market will resolve to \u201cNo\u201d.\n\nThe resolution source will be the official scoring of the fight, however a consensus of credible reporting may be used.",
+            "endDate": "2024-12-31T12:00:00Z",
+            "startDate": "2024-12-06T18:32:54.898652Z",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/pumpfun-banned-in-the-us-before-2025-ahBUiNSg-EbO.png",
+            "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/pumpfun-banned-in-the-us-before-2025-ahBUiNSg-EbO.png",
+            "description": "This market will resolve to \"Yes\" if trading on Pump.fun is banned for U.S. persons between December 5 and December 31, 2024, 11:59 PM ET. Otherwise, this market will resolve to \"No\".\n\nAn announcement from Pump.fun that a ban will be enacted on U.S. persons will qualify, regardless of if the ban is implemented before the deadline.\n\nThe primary resolution source for this market will be official information from Pump.fun, however a consensus of credible reporting will also be used.",
             "outcomes": [
               "Yes",
               "No"
@@ -31,41 +31,21 @@
               0.0,
               1.0
             ],
-            "volume": 5151.444259,
+            "volume": 37173.786031,
             "active": true,
             "closed": true
           }
         ],
         "tags": [
           {
-            "id": "1",
-            "label": "Sports",
-            "slug": "sports"
+            "id": "21",
+            "label": "Crypto",
+            "slug": "crypto"
           },
           {
-            "id": "100665",
-            "label": "props",
-            "slug": "props"
-          },
-          {
-            "id": "100775",
-            "label": "Fighting",
-            "slug": "fighting"
-          },
-          {
-            "id": "100203",
-            "label": "Ansem ",
-            "slug": "ansem-1"
-          },
-          {
-            "id": "275",
-            "label": "bitboy",
-            "slug": "bitboy"
-          },
-          {
-            "id": "101434",
-            "label": "Ansem vs. Bitboy",
-            "slug": "ansem-vspt-bitboy"
+            "id": "100150",
+            "label": "Memecoins",
+            "slug": "memecoins"
           }
         ],
         "binary": true
