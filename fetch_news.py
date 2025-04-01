@@ -52,10 +52,11 @@ def extract_keywords(title: str, description: str) -> list:
             "Extract optimized keywords from the following event title and description to query the GDELT dataset.\n"
             "Your goal is to find relevant English-language news articles about this event.\n"
             "Follow these rules:\n"
-            "- Remove stop-words (like 'the', 'to', 'of').\n"
-            "- Expand abbreviations (e.g., 'AI' → 'Artificial Intelligence', 'USA' → 'United States').\n"
-            "- If a keyword contains a hyphen (`-`), wrap it in double quotes (e.g., 'Ko Wen-je' → '\"Ko Wen-je\"').\n"
-            "- If a keyword is a multi-word phrase, wrap it in double quotes (e.g., 'Taiwan election' → '\"Taiwan Election\"').\n"
+            "- Include only the most relevant and specific keywords directly related to the core topic of the event. Avoid broad or generic terms.\n"
+            "- Do not include stop-words (like 'the', 'to', 'of').\n"
+            '- Expand abbreviations (e.g., "AI" should be "Artificial Intelligence", "USA" should be "United States").\n'
+            '- If a keyword contains a hyphen (-), wrap it in double quotes (e.g., "Ko Wen-je").\n'
+            '- If a keyword is a multi-word phrase, wrap it in double quotes (e.g., "Taiwan election").\n'
             "- Avoid generic or vague terms (like 'event', 'question', 'issue').\n"
             "- Return a comma-separated list of optimized keywords.\n\n"
             "Title: {title}\n"
@@ -68,7 +69,17 @@ def extract_keywords(title: str, description: str) -> list:
 
     chain: RunnableSequence = prompt | llm | parser
     keywords = chain.invoke({"title": title, "description": description})
-    return keywords
+    return clean_keywords(keywords)
+
+
+def clean_keywords(raw_keywords: list[str]) -> list[str]:
+    cleaned = []
+    for kw in raw_keywords:
+        # removing excessive brackets, hyphens
+        kw = kw.strip().strip("'").strip('"').strip()
+        if kw:
+            cleaned.append(kw)
+    return cleaned
 
 
 def format_query(keywords):
@@ -106,7 +117,7 @@ def process_events(json_path, save_path="data/news_results.json"):
             keywords = extract_keywords(title, description)
             query = format_query(keywords)
 
-            print(f"Processing event {event_id}: {title} | Query: {query}")
+            print(f"\033[1;30mProcessing event {event_id}: {title}\033[0m\n  Query: {query}")
 
             articles_metadata = gdelt.retrieve(
                 query=query,
@@ -117,16 +128,21 @@ def process_events(json_path, save_path="data/news_results.json"):
                 save_to_file=False
             )
 
-            articles = [
-                {
-                    "url": article["url"],
-                    "title": article["title"],
-                    "date": article["seendate"],
-                    "text": parse_article(article["url"])
-                }
-                for article in articles_metadata["articles"]
-                if article.get("language", "English") == "English"
-            ]
+            articles = []
+            for article in articles_metadata["articles"]:
+                if article.get("language", "English") != "English":
+                    # not considering articles in other languages for now
+                    continue
+                text = parse_article(article["url"])
+                if text:
+                    # sometimes returns empty text
+                    # if text is empty, skip the article
+                    articles.append({
+                        "url": article["url"],
+                        "title": article["title"],
+                        "date": article["seendate"],
+                        "text": text
+                    })
 
             results.append({
                 "id": event_id,
