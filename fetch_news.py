@@ -4,7 +4,7 @@ import json
 import requests
 import argparse
 from tqdm import tqdm
-from datetime import datetime
+from datetime import datetime, timedelta
 from newspaper import Article
 
 from langchain_openai import ChatOpenAI
@@ -34,15 +34,30 @@ def parse_article(url):
         return ""
 
 
-def date_for_gdelt(date):
+def gdelt_date_string(dt: datetime) -> str:
+    return dt.strftime("%Y%m%d%H%M%S")
+
+
+def parse_datetime(date: str) -> datetime | None:
     formats = ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d"]
     for fmt in formats:
         try:
-            dt = datetime.strptime(date, fmt)
-            return dt.strftime("%Y%m%d%H%M%S")
+            return datetime.strptime(date, fmt)
         except ValueError:
             continue
     return None
+
+
+def compute_pre_days(start: datetime, end: datetime) -> int:
+    duration = (end - start).days
+    if duration < 2:
+        return 1
+    elif duration <= 5:
+        return 2
+    elif duration <= 14:
+        return 3
+    else:
+        return 5
 
 
 def extract_keywords(title: str, description: str) -> list:
@@ -52,12 +67,13 @@ def extract_keywords(title: str, description: str) -> list:
             "Extract optimized keywords from the following event title and description to query the GDELT dataset.\n"
             "Your goal is to find relevant English-language news articles about this event.\n"
             "Follow these rules:\n"
-            "- Include only the most relevant and specific keywords directly related to the core topic of the event. Avoid broad or generic terms.\n"
-            "- Do not include stop-words (like 'the', 'to', 'of').\n"
+            "- Focus on named entities (e.g., people, organizations, usernames).\n"
+            "- Include only terms likely to appear in news coverage.\n"
+            "- Include synonyms or aliases if relevant.\n"
             '- Expand abbreviations (e.g., "AI" should be "Artificial Intelligence", "USA" should be "United States").\n'
             '- If a keyword contains a hyphen (-), wrap it in double quotes (e.g., "Ko Wen-je").\n'
             '- If a keyword is a multi-word phrase, wrap it in double quotes (e.g., "Taiwan election").\n'
-            "- Avoid generic or vague terms (like 'event', 'question', 'issue').\n"
+            "- Avoid dates and overly generic or technical terms not used in news headlines (e.g., 'market resolution', 'social media').\n"
             "- Return a comma-separated list of optimized keywords.\n\n"
             "Title: {title}\n"
             "Description: {description}\n\n"
@@ -75,10 +91,14 @@ def extract_keywords(title: str, description: str) -> list:
 def clean_keywords(raw_keywords: list[str]) -> list[str]:
     cleaned = []
     for kw in raw_keywords:
-        # removing excessive brackets, hyphens
-        kw = kw.strip().strip("'").strip('"').strip()
-        if kw:
-            cleaned.append(kw)
+        kw = kw.strip().strip("'\"")
+        if len(kw) < 3:
+            continue
+        if re.fullmatch(r"\d{1,2}(st|nd|rd|th)?", kw.lower()):
+            continue
+        if re.fullmatch(r"\d{4}", kw):
+            continue
+        cleaned.append(kw)
     return cleaned
 
 
@@ -107,12 +127,18 @@ def process_events(json_path, save_path="data/news_results.json"):
             title = event.get("title", "")
             description = event.get("markets", [{}])[0].get("description", "")
             outcome_prices = event.get("markets", [{}])[0].get("outcomePrices", [])
-            start_date = date_for_gdelt(event.get("startDate"))
-            end_date = date_for_gdelt(event.get("endDate"))
 
-            if not start_date or not end_date:
+            # computing pre-days to take for the the news coverage
+            start_dt = parse_datetime(event.get("startDate"))
+            end_dt = parse_datetime(event.get("endDate"))
+
+            if not start_dt or not end_dt:
                 print(f"\033[33m{'=' * (len(msg := f'Skipping event {event_id} due to missing dates.') + 4)}\n= {msg} =\n{'=' * (len(msg) + 4)}\033[0m")
                 continue
+
+            pre_days = compute_pre_days(start_dt, end_dt)
+            start_date = gdelt_date_string(start_dt - timedelta(days=pre_days))
+            end_date = gdelt_date_string(end_dt)
 
             keywords = extract_keywords(title, description)
             query = format_query(keywords)
