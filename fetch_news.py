@@ -117,7 +117,7 @@ def process_events(json_path, save_path="data/news_results.json"):
             keywords = extract_keywords(title, description)
             query = format_query(keywords)
 
-            print(f"\033[1;30mProcessing event {event_id}: {title}\033[0m\n  Query: {query}")
+            print(f"\033[1;30m\nProcessing event {event_id}: {title}\033[0m\n  Query: {query}")
 
             articles_metadata = gdelt.retrieve(
                 query=query,
