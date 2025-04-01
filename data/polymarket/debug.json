@@ -1,0 +1,73 @@
+
+[
+    {
+        "id": "15173",
+        "title": "Will BitBoy knockout Ansem?",
+        "slug": "will-bitboy-knockout-ansem",
+        "startDate": "2024-12-06T16:01:30.350157Z",
+        "endDate": "2024-12-06T12:00:00Z",
+        "active": true,
+        "archived": false,
+        "closed": true,
+        "liquidity": null,
+        "volume": 5151.444259,
+        "markets": [
+          {
+            "id": "514924",
+            "question": "Will BitBoy knockout Ansem?",
+            "conditionId": "0xd30b62a10d9879f2555900a8947dd1ab2dd17ba369a91fa356189aaf8783b17a",
+            "slug": "will-bitboy-knockout-ansem",
+            "resolutionSource": "",
+            "endDate": "2024-12-06T12:00:00Z",
+            "startDate": "2024-12-06T15:59:38.771Z",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-bitboy-knockout-ansem-3eQ5TfeLkzo9.png",
+            "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-bitboy-knockout-ansem-3eQ5TfeLkzo9.png",
+            "description": "Ansem (@blknoiz06) is scheduled to fight Ben Armstrong a.k.a. \"BitBoy\" (@BenArmstrongsX) on December 6, 2024 in Dubai. You can view this post to learn more: https://x.com/CryptoFightWeek/status/1836756340649435639\n\nThis market will resolve to \"Yes\" if Bitboy wins this fight by Knockout or TKO. Otherwise, this market will resolve to \u201cNo\u201d.\n\nIf this fight is canceled permanently, or is moved to a date after December 31, 2024, 11:59 PM ET, this market will resolve to \u201cNo\u201d.\n\nThe resolution source will be the official scoring of the fight, however a consensus of credible reporting may be used.",
+            "outcomes": [
+              "Yes",
+              "No"
+            ],
+            "outcomePrices": [
+              0.0,
+              1.0
+            ],
+            "volume": 5151.444259,
+            "active": true,
+            "closed": true
+          }
+        ],
+        "tags": [
+          {
+            "id": "1",
+            "label": "Sports",
+            "slug": "sports"
+          },
+          {
+            "id": "100665",
+            "label": "props",
+            "slug": "props"
+          },
+          {
+            "id": "100775",
+            "label": "Fighting",
+            "slug": "fighting"
+          },
+          {
+            "id": "100203",
+            "label": "Ansem ",
+            "slug": "ansem-1"
+          },
+          {
+            "id": "275",
+            "label": "bitboy",
+            "slug": "bitboy"
+          },
+          {
+            "id": "101434",
+            "label": "Ansem vs. Bitboy",
+            "slug": "ansem-vspt-bitboy"
+          }
+        ],
+        "binary": true
+      }
+]
