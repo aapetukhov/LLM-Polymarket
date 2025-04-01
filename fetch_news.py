@@ -100,7 +100,7 @@ def process_events(json_path, save_path="data/news_results.json"):
             end_date = date_for_gdelt(event.get("endDate"))
 
             if not start_date or not end_date:
-                print(f"Skipping event {event_id} due to missing dates.")
+                print(f"\033[33m{'=' * (len(msg := f'Skipping event {event_id} due to missing dates.') + 4)}\n= {msg} =\n{'=' * (len(msg) + 4)}\033[0m")
                 continue
 
             keywords = extract_keywords(title, description)
@@ -137,16 +137,16 @@ def process_events(json_path, save_path="data/news_results.json"):
                 "outcome_prices": outcome_prices,
                 "articles": articles
             })
-            print(f"Found {len(articles)} articles for event {event_id}")
+            print(f"\033[32m{'=' * (len(msg := f'Found {len(articles)} articles for event {event_id}') + 4)}\n= {msg} =\n{'=' * (len(msg) + 4)}\033[0m")
 
         except Exception as e:
-            print(f"Error processing event {event_id}: {e}")
+            print(f"\033[91m{'=' * (len(msg := f'Error processing event {event_id}: {e}') + 4)}\n= {msg} =\n{'=' * (len(msg) + 4)}\033[0m")
             continue
 
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
 
-    print(f"Processing complete. Results saved to {save_path}")
+    print(f"\033[34m{'=' * (len(msg := f'Processing complete. Results saved to {save_path}') + 4)}\n= {msg} =\n{'=' * (len(msg) + 4)}\033[0m")
 
 
 if __name__ == "__main__":
