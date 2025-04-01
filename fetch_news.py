@@ -12,6 +12,7 @@ from langchain.prompts import PromptTemplate
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.chains.llm import LLMChain
 from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain_core.runnables import RunnableSequence
 
 from src.polymarket.gamma import GammaMarketClient
 from src.gdelt import GDELTRetriever
@@ -62,12 +63,11 @@ def extract_keywords(title: str, description: str) -> list:
             "Optimized Keywords:"
         )
     )
-    chain = LLMChain(
-        llm=ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY")),
-        prompt=prompt,
-        output_parser=CommaSeparatedListOutputParser()
-    )
-    keywords = chain.run({"title": title, "description": description})
+    llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    parser = CommaSeparatedListOutputParser()
+
+    chain: RunnableSequence = prompt | llm | parser
+    keywords = chain.invoke({"title": title, "description": description})
     return keywords
 
 
@@ -137,6 +137,7 @@ def process_events(json_path, save_path="data/news_results.json"):
                 "outcome_prices": outcome_prices,
                 "articles": articles
             })
+            print(f"Found {len(articles)} articles for event {event_id}")
 
         except Exception as e:
             print(f"Error processing event {event_id}: {e}")
