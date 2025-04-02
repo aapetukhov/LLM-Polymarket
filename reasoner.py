@@ -152,7 +152,7 @@ def process_events(events):
             prediction = evaluate_event(event)
             if DEBUG:
                 msg = (
-                    f"Event ID: {prediction['id']}\n"
+                    f"\n\nEvent ID: {prediction['id']}\n"
                     f"\033[1;30mTitle:\033[0m {prediction['title']}\n"
                     f"\033[1;30mDescription:\033[0m {prediction['description']}\n"
                     f"\033[1;30mDates:\033[0m {readable_date(prediction['start_date'])} → {readable_date(prediction['end_date'])}\n"
@@ -165,7 +165,7 @@ def process_events(events):
         except Exception as e:
             if DEBUG:
                 err_msg = (
-                    f"Error processing event {event.get('id', 'unknown')}:\n"
+                    f"\n\nError processing event {event.get('id', 'unknown')}:\n"
                     f"Title: {event.get('title', 'N/A')}\n"
                     f"Description: {event.get('description', 'N/A')}\n"
                     f"Start Date: {event.get('start_date', 'N/A')}, End Date: {event.get('end_date', 'N/A')}\n"
