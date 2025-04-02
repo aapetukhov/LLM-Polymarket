@@ -134,3 +134,5 @@ testing.json
 # notebooks for charts and debug
 tags_distribution.ipynb
 notebooks/*
+test_openai.py
+process_questions.py
