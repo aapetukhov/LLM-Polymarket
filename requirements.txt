@@ -1,14 +1,11 @@
-# torch==2.2.0
-# torchvision==0.17.0
-# torchmetrics
+#openai tools
+openai==1.7.0
+
 numpy==1.26.4
 tqdm
 ipykernel
 matplotlib
 pandas
-# wandb
-# comet_ml
-# hydra-core
 
 # black
 # isort
@@ -20,16 +17,13 @@ lxml_html_clean
 
 # langchain tools
 langchain
+langchain-openai
 langgraph
 pydantic
 pydantic-settings
 
-#openai tools
-openai
-langchain-openai
-
 # crawl4ai
-Crawl4AI
+# Crawl4AI
 
 # env setup tools
 python-dotenv
