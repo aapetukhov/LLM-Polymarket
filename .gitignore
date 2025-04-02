@@ -125,3 +125,8 @@ autocast_questions.json
 # tests
 test_polymarket.py
 subsample.ipynb
+
+# testing json files
+debug.json
+sample.json
+testing.json
