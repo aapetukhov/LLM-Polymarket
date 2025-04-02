@@ -155,7 +155,7 @@ def process_events(events):
                     f"\n\nEvent ID: {prediction['id']}\n"
                     f"\033[1;30mTitle:\033[0m {prediction['title']}\n"
                     f"\033[1;30mDescription:\033[0m {prediction['description']}\n"
-                    f"\033[1;30mDates:\033[0m {readable_date(prediction['start_date'])} → {readable_date(prediction['end_date'])}\n"
+                    f"\033[1;30mDates:\033[0m {readable_date(prediction['start_date'])} to {readable_date(prediction['end_date'])}\n"
                     f"\033[1;30mModel Prediction:\033[0m {prediction['probability_yes']}% yes\n"
                     f"\033[1;30mJustification:\033[0m {prediction['justification']}\n"
                     + "=" * 60
