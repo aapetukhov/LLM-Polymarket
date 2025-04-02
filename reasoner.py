@@ -44,6 +44,7 @@ def build_event_prompt(event):
         f"[{i+1}] TITLE: {a.get('title', '').strip()}\nDATE: {a.get('date', '').strip()}\nTEXT: {a.get('text', '').strip()}"
         for i, a in enumerate(event["articles"][:5])
     ])
+    # TOP-k articles = 5 here !!!
     start = readable_date(event["start_date"])
     end = readable_date(event["end_date"])
 
