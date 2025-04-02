@@ -1,3 +1,7 @@
+"""
+This script evaluates events using a language model (LLM) to predict the probability of an event resolving as 'Yes' based on provided news articles.
+The model used by default is OpenAI's GPT-4o, and the script is designed to work with events that have a specific structure in a JSON file.
+"""
 import os
 import json
 import argparse
