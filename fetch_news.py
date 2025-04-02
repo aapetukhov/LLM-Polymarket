@@ -1,3 +1,11 @@
+"""
+This script fetches news articles related to events from a JSON file, processes them, and saves the results to a new JSON file.
+It uses the GDELT API to retrieve articles based on keywords extracted from the event title and description.
+The script includes functions to parse articles, compute date ranges, extract keywords, and format queries.
+It also includes a command-line interface for specifying input and output file paths.
+The script uses the Newspaper3k library to parse articles and the Langchain library for LLM processing.
+The script is designed to be run from the command line and takes two arguments: the path to the input JSON file and the path to save the output JSON file.
+"""
 import os
 import re
 import json
