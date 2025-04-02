@@ -13,6 +13,9 @@ from datetime import datetime
 
 load_dotenv()
 
+
+DEBUG = True
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 schema = {
@@ -147,13 +150,35 @@ def process_events(events):
     for event in tqdm(events, desc="Processing events"):
         try:
             prediction = evaluate_event(event)
+            if DEBUG:
+                msg = (
+                    f"Event ID: {prediction['id']}\n"
+                    f"\033[1;30mTitle:\033[0m {prediction['title']}\n"
+                    f"\033[1;30mDescription:\033[0m {prediction['description']}\n"
+                    f"\033[1;30mDates:\033[0m {readable_date(prediction['start_date'])} → {readable_date(prediction['end_date'])}\n"
+                    f"\033[1;30mModel Prediction:\033[0m {prediction['probability_yes']}% yes\n"
+                    f"\033[1;30mJustification:\033[0m {prediction['justification']}\n"
+                    + "=" * 60
+                )
+                print(f"\033[32m{msg}\033[0m")
             results.append(prediction)
         except Exception as e:
+            if DEBUG:
+                err_msg = (
+                    f"Error processing event {event.get('id', 'unknown')}:\n"
+                    f"Title: {event.get('title', 'N/A')}\n"
+                    f"Description: {event.get('description', 'N/A')}\n"
+                    f"Start Date: {event.get('start_date', 'N/A')}, End Date: {event.get('end_date', 'N/A')}\n"
+                    f"Articles: {len(event.get('articles', []))}\n"
+                    f"\033[91mError: {str(e)}\033[0m"
+                )
+                print(f"\033[91m{'=' * 60}\n{err_msg}\n{'=' * 60}\033[0m")
             results.append({
                 "id": event.get("id", "unknown"),
                 "error": str(e)
             })
     return results
+
 
 def main():
     parser = argparse.ArgumentParser()
