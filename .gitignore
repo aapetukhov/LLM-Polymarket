@@ -140,3 +140,6 @@ old_main.py
 scores.ipynb
 
 TOTAL_TOKENS.txt
+chunks/
+results_chunks/
+llm_data.json
