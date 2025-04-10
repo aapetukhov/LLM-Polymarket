@@ -143,3 +143,4 @@ TOTAL_TOKENS.txt
 chunks/
 results_chunks/
 llm_data.json
+llm_data_debug.json
