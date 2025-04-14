@@ -160,7 +160,8 @@ def process_events(json_path, save_path="data/news_results.json"):
                 startdatetime=start_date,
                 enddatetime=end_date,
                 language="eng",
-                save_to_file=False
+                save_to_file=False,
+                maxrecords=100
             )
 
             articles = []

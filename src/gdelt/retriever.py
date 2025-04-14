@@ -45,7 +45,7 @@ class GDELTRetriever:
             - sort (str): Sort by ... (e.g. HybridRel - relevance, DateDesc - by date in descending order,
             ToneDesc - by tone in descending order).
             - language (str): 'eng', 'fra', etc.
-            - **kwargs: Additional GDELT API parameters.
+            - **kwargs: Additional GDELT API parameters, e.g. maxrecords
 
         Returns:
             dict: Query params.
