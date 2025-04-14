@@ -203,8 +203,8 @@ def process_events(json_path, save_path="data/news_results.json"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("json_path", type=str, help="Path to input JSON file")
-    parser.add_argument("save_path", type=str, nargs="?", default="data/news_results.json", help="Path to save output JSON")
+    parser.add_argument("--json_path", type=str, help="Path to input JSON file")
+    parser.add_argument("--save_path", type=str, nargs="?", default="data/news_results.json",
+                        help="Path to save output JSON")
     args = parser.parse_args()
-
     process_events(args.json_path, args.save_path)
