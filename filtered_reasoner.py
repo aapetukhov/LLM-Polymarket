@@ -152,7 +152,8 @@ def evaluate_event_experiments(event):
             "prediction": {
                 "probability_yes": response_data["output_parsed"]["probability_yes"],
                 "justification": response_data["output_parsed"]["justification"],
-                "raw_response": response_data["raw_response"]
+                "usage": response_data["raw_response"]["usage"],
+                "meta": response_data["raw_response"]["text"]
             }
         })
     return experiments
