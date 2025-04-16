@@ -184,13 +184,19 @@ def process_events(events):
             if DEBUG:
                 for exp in experiments:
                     print(
+                        f"{'\n'}"
                         f"\033[94m[Event {exp['event_id']} | Exp {exp['experiment']}]\033[0m "
                         f"\033[92m{exp['prediction']['probability_yes']}% yes\033[0m - "
                         f"\033[93m{exp['prediction']['justification']}\033[0m"
+                        f"{'\n'}"
                     )
         except Exception as e:
             if DEBUG:
-                print(f"\033[91m[Error] Event {event.get('id', 'unknown')}:\033[0m {str(e)}")
+                print(
+                    f"{'\n'}"
+                    f"\033[91m[Error] Event {event.get('id', 'unknown')}:\033[0m {str(e)}"
+                    f"{'\n'}"
+                )
             results.append({"event_id": event.get("id", "unknown"), "error": str(e)})
     return results
 
