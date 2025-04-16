@@ -177,7 +177,8 @@ def process_events(events):
                         "pred_date": exp["pred_date"],
                         "probability_yes": exp["prediction"]["probability_yes"],
                         "justification": exp["prediction"]["justification"],
-                        "raw_response": exp["prediction"]["raw_response"]
+                        "usage": exp["prediction"]["usage"],
+                        "meta": exp["prediction"]["meta"]
                     }
                     for exp in experiments
                 ]
