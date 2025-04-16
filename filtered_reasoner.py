@@ -45,7 +45,7 @@ def compute_cutoff_dates(event, n=4):
     start = parse_dt(event["start_date"])
     end = parse_dt(event["end_date"])
     delta = end - start - timedelta(seconds=1)
-    return {k: start + delta * (k / n) for k in [3, 4]}
+    return {k: start + delta * (k / n) for k in [1, 2, 3, 4]}
 
 
 def build_event_prompt(event, cutoff):
