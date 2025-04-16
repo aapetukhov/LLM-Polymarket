@@ -71,10 +71,11 @@ NEWS ARTICLES:
 ---
 
 REASONING STEPS:
-1. Analyze the evidence in the articles.
-2. Determine whether they suggest the event is likely to happen.
-3. Estimate the probability (0–100) that the outcome is "Yes".
-4. Justify your estimate with 1–2 clear sentences.
+1. Write down any additional relevant information that is not included above. This should be specific facts that you already know the answer to, rather than information that needs to be looked up.
+2. Analyze the evidence in the articles.
+3. Determine whether they suggest the event is likely to happen.
+4. Estimate the probability (0–100) that the outcome is "Yes".
+5. Justify your estimate with 1–2 clear sentences.
 
 ---
 

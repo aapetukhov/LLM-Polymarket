@@ -147,3 +147,4 @@ llm_data_debug.json
 summarized_llm_data_0-299.json
 fetch_news_1.py
 news_chunks/
+news_chunks_scored/
