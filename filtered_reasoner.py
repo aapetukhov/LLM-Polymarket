@@ -209,7 +209,7 @@ def main():
         data = json.load(f)
     events = data if isinstance(data, list) else [data]
     if len(events) > 400:
-        events = random.sample(events, 400)
+        events = random.sample(events, 2)
     results = process_events(events)
     with open(args.output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
