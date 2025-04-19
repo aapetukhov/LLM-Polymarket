@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
-TOP_K = 15
+TOP_K = 5
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -44,7 +44,7 @@ def parse_article_dt(dt_str, fmt="%Y%m%dT%H%M%SZ"):
 
 def compute_cutoff_dates(event, n=4):
     start = parse_dt(event["start_date"])
-    end = parse_dt(event["end_date"])
+    end = parse_dt(event["resolution_time"])
     delta = end - start - timedelta(seconds=1)
     return {k: start + delta * (k / n) for k in [1, 2, 3, 4]}
 
@@ -67,7 +67,7 @@ Estimate the probability that the event resolves as "Yes" using only news articl
 
 EVENT:
 Question: {event["title"].strip()}
-Description: {event["description"].strip()}
+Description and resolution conditions: {event["description"].strip()}
 Date range: {start_str} to {end_str}
 
 REASONING STEPS:
@@ -93,12 +93,12 @@ RESPONSE FORMAT (JSON):
   "probability_yes": <integer 0-100>,
   "justification": "<brief explanation>"
 }}
-""".strip()
+""".strip(), len(articles)
 
 
 def query_llm(prompt, event):
     response = client.responses.create(
-        model="gpt-4o-mini-2024-07-18",
+        model="gpt-4.1-mini-2025-04-14",
         input=[{"role": "user", "content": prompt}],
         instructions="You are an expert geopolitical forecaster. Think like a superforecaster (e.g. Nate Silver).",
         text={
@@ -139,7 +139,7 @@ def evaluate_event_experiments(event):
     experiments = []
     cutoffs = compute_cutoff_dates(event)
     for k, cutoff in cutoffs.items():
-        prompt = build_event_prompt(event, cutoff)
+        prompt, num_articles = build_event_prompt(event, cutoff)
         response_data = query_llm(prompt, event)
         experiments.append({
             "event_id": event["id"],
@@ -149,12 +149,14 @@ def evaluate_event_experiments(event):
             "description": event["description"],
             "start_date": event["start_date"],
             "end_date": event["end_date"],
+            "resolution_time": event["resolution_time"],
             "outcome_prices": event["outcome_prices"],
             "prediction": {
                 "probability_yes": response_data["output_parsed"]["probability_yes"],
                 "justification": response_data["output_parsed"]["justification"],
                 "usage": response_data["raw_response"]["usage"],
-                "meta": response_data["raw_response"]["text"]
+                "meta": response_data["raw_response"]["text"],
+                "num_articles": num_articles
             }
         })
     return experiments
@@ -171,6 +173,7 @@ def process_events(events):
                 "description": event["description"],
                 "start_date": event["start_date"],
                 "end_date": event["end_date"],
+                "resolution_time": event["resolution_time"],
                 "outcome_prices": event["outcome_prices"],
                 "predictions": [
                     {
