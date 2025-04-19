@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
+TOP_K = 10
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -51,8 +52,8 @@ def compute_cutoff_dates(event, n=4):
 def build_event_prompt(event, cutoff):
     cutoff_str = cutoff.strftime("%B %d, %Y, %H:%M")
     filtered = [a for a in event["articles"]
-                if a.get("score", 0) > -1 and parse_article_dt(a["date"]) <= cutoff]
-    articles = filtered[:5]
+                if a.get("score", 0) > -2 and parse_article_dt(a["date"]) <= cutoff]
+    articles = filtered[:TOP_K]
     articles_text = "\n\n".join([
         f"[{i+1}] TITLE: {a.get('title', '').strip()}\nDATE: {a.get('date', '').strip()}\nTEXT: {a.get('text', '').strip()}"
         for i, a in enumerate(articles)
