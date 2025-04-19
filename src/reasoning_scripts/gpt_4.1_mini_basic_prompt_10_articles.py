@@ -52,7 +52,7 @@ def compute_cutoff_dates(event, n=4):
 def build_event_prompt(event, cutoff):
     cutoff_str = cutoff.strftime("%B %d, %Y, %H:%M")
     filtered = [a for a in event["articles"]
-                if a.get("score", 0) > -2 and parse_article_dt(a["date"]) <= cutoff]
+                if a.get("score", 0) > -3 and parse_article_dt(a["date"]) <= cutoff]
     articles = filtered[:TOP_K]
     articles_text = "\n\n".join([
         f"[{i+1}] TITLE: {a.get('title', '').strip()}\nDATE: {a.get('date', '').strip()}\nTEXT: {a.get('text', '').strip()}"
