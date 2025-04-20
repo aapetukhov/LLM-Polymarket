@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
-TOP_K = 5
+TOP_K = 10
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
