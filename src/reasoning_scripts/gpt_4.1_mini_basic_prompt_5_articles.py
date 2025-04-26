@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
-TOP_K = 15
+TOP_K = 5
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -46,7 +46,7 @@ def compute_cutoff_dates(event, n=4):
     start = parse_dt(event["start_date"])
     end = parse_dt(event["resolution_time"])
     delta = end - start - timedelta(seconds=1)
-    return {k: start + delta * (k / n) for k in [1, 2, 3, 4]}
+    return {k: start + delta * (k / n) for k in [4]}
 
 
 def build_event_prompt(event, cutoff):
@@ -98,7 +98,7 @@ RESPONSE FORMAT (JSON):
 
 def query_llm(prompt, event):
     response = client.responses.create(
-        model="gpt-4o-mini-2024-07-18",
+        model="gpt-4.1-mini-2025-04-14",
         input=[{"role": "user", "content": prompt}],
         instructions="You are an expert geopolitical forecaster. Think like a superforecaster (e.g. Nate Silver).",
         text={
@@ -173,6 +173,7 @@ def process_events(events):
                 "description": event["description"],
                 "start_date": event["start_date"],
                 "end_date": event["end_date"],
+                "resolution_time": event["resolution_time"],
                 "outcome_prices": event["outcome_prices"],
                 "predictions": [
                     {
