@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
-TOP_K = 15
+TOP_K = 5
 MODEL_NAME = "gpt-4.1-mini-2025-04-14"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -47,7 +47,7 @@ def compute_cutoff_dates(event, n=4):
     start = parse_dt(event["start_date"])
     end = parse_dt(min(event["end_date"], event["resolution_time"]))
     delta = end - start - timedelta(seconds=1)
-    return {k: start + delta * (k / n) for k in [1, 2, 3, 4]}
+    return {k: start + delta * (k / n) for k in [4]}
 
 
 def build_event_prompt(event, cutoff):
