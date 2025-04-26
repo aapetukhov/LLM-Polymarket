@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DEBUG = True
-TOP_K = 5
+TOP_K = 10
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -98,7 +98,7 @@ RESPONSE FORMAT (JSON):
 
 def query_llm(prompt, event):
     response = client.responses.create(
-        model="gpt-4.1-mini-2025-04-14",
+        model="gpt-4o-mini-2024-07-18",
         input=[{"role": "user", "content": prompt}],
         instructions="You are an expert geopolitical forecaster. Think like a superforecaster (e.g. Nate Silver).",
         text={
@@ -173,7 +173,6 @@ def process_events(events):
                 "description": event["description"],
                 "start_date": event["start_date"],
                 "end_date": event["end_date"],
-                "resolution_time": event["resolution_time"],
                 "outcome_prices": event["outcome_prices"],
                 "predictions": [
                     {
