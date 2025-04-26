@@ -44,7 +44,7 @@ def parse_article_dt(dt_str, fmt="%Y%m%dT%H%M%SZ"):
 
 def compute_cutoff_dates(event, n=4):
     start = parse_dt(event["start_date"])
-    end = parse_dt(event["resolution_time"])
+    end = parse_dt(min(event["end_date"], event["resolution_time"]))
     delta = end - start - timedelta(seconds=1)
     return {k: start + delta * (k / n) for k in [4]}
 
