@@ -103,8 +103,8 @@ Use the following reasoning framework to structure your forecast:
 
 RESPONSE FORMAT (JSON):
 {{
+  "justification": "<explanation>",
   "probability_yes": <integer 0-100>,
-  "justification": "<explanation>"
 }}
 """.strip()
     return prompt, len(articles)
@@ -117,7 +117,7 @@ def query_llm(prompt, event_id):
         "response_format": {
             "type": "json_schema",
             "json_schema": {"schema": SCHEMA, "strict": True},
-            "required": ["probability_yes", "justification"]
+            "required": ["justification", "probability_yes"]
         },
         "temperature": 0.0,
         "max_output_tokens": 1024,
@@ -130,14 +130,14 @@ def query_llm(prompt, event_id):
         resp = requests.post(f"{BASE_URL}/chat/completions", headers=HEADERS, json=payload, timeout=30)
         resp.raise_for_status()
     except requests.exceptions.RequestException as e:
-        print(f"[Event {event_id}] Request failed: {e}")
+        print(f"\033[91m[Event {event_id}] Request failed: {e}\033[0m")
         return {"raw_response": None, "output_parsed": None, "error": f"request_failed: {e}"}
 
     try:
         data = resp.json()
     except ValueError as e:
         text = resp.text
-        print(f"[Event {event_id}] Response not valid JSON: {e}")
+        print(f"\033[91m[Event {event_id}] Response not valid JSON: {e}\033[0m")
         return {"raw_response": resp.text, "output_parsed": {"parse_error": True, "raw_text": text}, "error": "invalid_json"}
 
     choice = data.get("choices", [{}])[0]
@@ -175,10 +175,18 @@ def evaluate_event(event):
             entry["usage"] = resp["raw_response"].get("usage")
         if resp.get("error"):
             entry["error"] = resp["error"]
-            print(f"[Event {event['id']} | {name}] Handled error: {resp['error']}")
+            print(
+                f"\033[91m[Error] Event {event['id']} | {name}:\033[0m {resp['error']}"
+            )
+            print()
         else:
             if DEBUG:
-                print(f"[Event {event['id']} | {name}] {entry['probability_yes']}% yes - {entry['justification']}")
+                print(
+                    f"\033[94m[Event {event['id']} | {name}]\033[0m "
+                    f"\033[92m{entry['probability_yes']}% yes\033[0m - "
+                    f"\033[93m{entry['justification']}\033[0m"
+                )
+                print()
         results.append(entry)
 
     return results
@@ -230,7 +238,7 @@ def main():
                     "predictions": preds
                 })
             except Exception as e:
-                print(f"[Event {event.get('id')}] Evaluation failed: {e}")
+                print(f"\033[91m[Event {event.get('id')}] Evaluation failed:\033[0m \033[93m{type(e).__name__}\033[0m - {str(e)}")
                 results.append({"event_id": event.get("id"), "error": str(e)})
             finally:
                 with open(args.output_path, 'w', encoding='utf-8') as out_f:
