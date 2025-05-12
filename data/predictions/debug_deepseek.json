@@ -1,0 +1,30 @@
+[
+  {
+    "event_id": "15189",
+    "title": "Calin Georgescu arrested in 2024?",
+    "description": "This market will resolve to \"Yes\" if Calin Georgescu is arrested between December 5, and December 31, 2024, 11:59 PM ET. Otherwise, this market will resolve to \"No\".\n\nThe primary resolution source for this market will be official information from the arresting government and law enforcement, however a consensus of credible reporting may also be used.",
+    "start_date": "20241201201527",
+    "end_date": "20241231120000",
+    "resolution_time": "20250101081256",
+    "predictions": [
+      {
+        "event_id": "15189",
+        "experiment": 3,
+        "pred_date": "20241224020351",
+        "probability_yes": 45,
+        "justification": "The probability that Calin Georgescu is arrested between December 5 and December 31, 2024, is estimated at 45%. This estimate is based on the following analysis: 1. **Base Rate**: Arrests of high-profile political figures in Romania are relatively rare, especially during election-related controversies, but recent investigations into Georgescu's campaign suggest heightened scrutiny. 2. **Key Evidence**: Multiple raids, detentions, and judicial actions targeting Georgescu's associates (e.g., Horatiu Potra, Bogdan Peschir, Eugen Sechila) indicate a serious investigation into illegal campaign financing, voter manipulation, and potential ties to foreign interference. 3. **Recent Developments**: The Constitutional Court's annulment of the presidential election and the declassification of intelligence reports alleging Russian meddling have intensified the legal and political pressure on Georgescu. 4. **Influence and Incentives**: Romanian law enforcement and judicial authorities have a strong incentive to demonstrate accountability and address allegations of electoral fraud, but political sensitivities and the potential for public backlash may constrain their actions. 5. **Legal and Institutional Factors**: The legal framework in Romania allows for arrests in cases of serious criminal allegations, but the process is subject to judicial oversight and procedural delays. 6. **Alternative Viewpoints**: An opposing forecaster might argue that Georgescu's political influence and the lack of direct evidence linking him to criminal activity reduce the likelihood of his arrest. 7. **High-Impact Events**: Unlikely but high-impact events, such as new evidence of direct criminal involvement or a significant shift in public opinion, could drastically alter the situation. Overall, while the evidence suggests a significant risk of arrest, the outcome remains uncertain due to legal, political, and procedural complexities.",
+        "usage": null,
+        "num_articles": 15
+      },
+      {
+        "event_id": "15189",
+        "experiment": 4,
+        "pred_date": "20241231115959",
+        "probability_yes": 45,
+        "justification": "The probability that Calin Georgescu is arrested between December 5 and December 31, 2024, is estimated at 45%. This is based on the following analysis: 1. **Base Rate**: Arrests of high-profile political figures in Romania are relatively rare but not unprecedented, especially in cases involving allegations of electoral fraud, foreign interference, or connections to extremist groups. 2. **Key Evidence**: There is significant scrutiny on Georgescu, with investigations into his campaign financing, connections to far-right figures like Horatiu Potra, and alleged Russian meddling. Raids, detentions, and judicial actions against his associates (e.g., Potra, Eugen Sechila) suggest a tightening legal net. 3. **Recent Developments**: The annulment of the presidential election and the declassification of intelligence reports have intensified the focus on Georgescu. His public threats against judges and the Constitutional Court may further provoke legal action. 4. **Influence and Incentives**: The Romanian judiciary and intelligence services have strong incentives to act against perceived threats to national security and electoral integrity. However, political considerations and public opinion may constrain their actions. 5. **Legal and Cultural Factors**: Romania’s legal system is robust but can be slow and influenced by political pressures. Cultural resistance to perceived overreach by authorities could also play a role. 6. **Alternative Viewpoints**: An opposing forecaster might argue that Georgescu’s arrest is unlikely due to insufficient evidence, political protection, or the risk of inflaming his supporters. 7. **High-Impact Events**: Unlikely but high-impact events, such as a major escalation in the investigation or a public scandal, could drastically shift the situation. Overall, while the evidence suggests a significant risk of arrest, the outcome remains uncertain due to legal and political complexities.",
+        "usage": null,
+        "num_articles": 15
+      }
+    ]
+  }
+]

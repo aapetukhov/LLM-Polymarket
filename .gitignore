@@ -153,3 +153,7 @@ debug_gpt_4.1.json
 
 experiments/
 experiments_with_spoilers/
+final_test_1000.json
+main_results.png
+debug_deepseek.json
+polymarket_resolved_test_1000.json
