@@ -93,6 +93,3 @@ class Article(BaseModel):
     publishedAt: Optional[str]
     content: Optional[str]
 
-
-# TODO: add object for article summarization
-# TODO: add object for probability prediction

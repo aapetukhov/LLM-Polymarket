@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 import json
 import argparse
 from tqdm import tqdm
@@ -115,57 +116,71 @@ def query_llm(prompt, event_id):
         "messages": [{"role": "user", "content": prompt}],
         "response_format": {
             "type": "json_schema",
-            "json_schema": {
-                "schema": SCHEMA,
-                "strict": True
-            },
+            "json_schema": {"schema": SCHEMA, "strict": True},
             "required": ["probability_yes", "justification"]
         },
         "temperature": 0.0,
         "max_output_tokens": 1024,
         "logprobs": True,
         "top_logprobs": 5,
-        "provider": {
-            "only": ["DeepInfra", "NovitaAI", "Nebius AI Studio"],
-            "require_parameters": False
-        },
-        # "metadata": {"event_id": event_id},
-        # "user": str(event_id),
+        "provider": {"only": ["DeepInfra", "NovitaAI", "Nebius AI Studio"], "require_parameters": False}
     }
-    resp = requests.post(f"{BASE_URL}/chat/completions", headers=HEADERS, json=payload)
-    resp.raise_for_status()
-    data = resp.json()
 
-    choice = data["choices"][0]
-    text = choice["message"]["content"]
+    try:
+        resp = requests.post(f"{BASE_URL}/chat/completions", headers=HEADERS, json=payload, timeout=30)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"[Event {event_id}] Request failed: {e}")
+        return {"raw_response": None, "output_parsed": None, "error": f"request_failed: {e}"}
+
+    try:
+        data = resp.json()
+    except ValueError as e:
+        text = resp.text
+        print(f"[Event {event_id}] Response not valid JSON: {e}")
+        return {"raw_response": resp.text, "output_parsed": {"parse_error": True, "raw_text": text}, "error": "invalid_json"}
+
+    choice = data.get("choices", [{}])[0]
+    text = choice.get("message", {}).get("content", "")
+
     clean = re.sub(r"^```(?:json)?\s*|```$", "", text.strip(), flags=re.IGNORECASE)
-    parsed = json.loads(clean)
 
-    return {
-        "raw_response": choice,
-        "output_parsed": parsed
-    }
+    try:
+        parsed = json.loads(clean)
+    except json.JSONDecodeError as e:
+        print(f"[Event {event_id}] JSON schema parse error: {e}")
+        return {"raw_response": choice, "output_parsed": {"parse_error": True, "raw_text": clean}, "error": "schema_parse_error"}
+
+    return {"raw_response": choice, "output_parsed": parsed}
 
 
 
 def evaluate_event(event):
     results = []
     cutoffs = compute_cutoff_dates(event)
-    for k, cutoff in cutoffs.items():
+
+    for name, cutoff in cutoffs.items():
         prompt, num_articles = build_event_prompt(event, cutoff)
         resp = query_llm(prompt, event["id"])
-        out = resp["output_parsed"]
-        results.append({
+        parsed = resp.get("output_parsed", {}) or {}
+        entry = {
             "event_id": event["id"],
-            "experiment": k,
+            "experiment": name,
             "pred_date": cutoff.strftime("%Y%m%d%H%M%S"),
-            "probability_yes": out["probability_yes"],
-            "justification": out["justification"],
-            "usage": resp["raw_response"].get("usage"),
-            "num_articles": num_articles
-        })
-        if DEBUG:
-            print(f"[Event {event['id']} | Exp {k}] {out['probability_yes']}% yes - {out['justification']}")
+            "probability_yes": parsed.get("probability_yes"),
+            "justification": parsed.get("justification"),
+            "num_articles": num_articles,
+        }
+        if resp.get("raw_response") and isinstance(resp["raw_response"], dict):
+            entry["usage"] = resp["raw_response"].get("usage")
+        if resp.get("error"):
+            entry["error"] = resp["error"]
+            print(f"[Event {event['id']} | {name}] Handled error: {resp['error']}")
+        else:
+            if DEBUG:
+                print(f"[Event {event['id']} | {name}] {entry['probability_yes']}% yes - {entry['justification']}")
+        results.append(entry)
+
     return results
 
 
@@ -192,17 +207,49 @@ def process_events(events):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", required=True, help="Path to input JSON file")
-    parser.add_argument("--output_path", required=True, help="Path to write output JSON file")
+    parser.add_argument("--input_path", required=True)
+    parser.add_argument("--output_path", required=True)
     args = parser.parse_args()
 
     with open(args.input_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     events = data if isinstance(data, list) else [data]
 
-    results = process_events(events)
-    with open(args.output_path, 'w', encoding='utf-8') as out:
-        json.dump(results, out, ensure_ascii=False, indent=2)
+    results = []
+    try:
+        for event in tqdm(events, desc="Processing events"):
+            try:
+                preds = evaluate_event(event)
+                results.append({
+                    "event_id": event.get("id"),
+                    "title": event.get("title"),
+                    "description": event.get("description"),
+                    "start_date": event.get("start_date"),
+                    "end_date": event.get("end_date"),
+                    "resolution_time": event.get("resolution_time"),
+                    "predictions": preds
+                })
+            except Exception as e:
+                print(f"[Event {event.get('id')}] Evaluation failed: {e}")
+                results.append({"event_id": event.get("id"), "error": str(e)})
+            finally:
+                with open(args.output_path, 'w', encoding='utf-8') as out_f:
+                    json.dump(results, out_f, ensure_ascii=False, indent=2)
+
+            if len(results) % 100 == 0:
+                with open(args.output_path, 'w', encoding='utf-8') as out_f:
+                    json.dump(results, out_f, ensure_ascii=False, indent=2)
+
+    except KeyboardInterrupt:
+        print("Interrupted by user, saving progress and exiting...")
+        with open(args.output_path, 'w', encoding='utf-8') as out_f:
+            json.dump(results, out_f, ensure_ascii=False, indent=2)
+        sys.exit(1)
+
+    with open(args.output_path, 'w', encoding='utf-8') as out_f:
+        json.dump(results, out_f, ensure_ascii=False, indent=2)
+
+    print(f"Processing complete. Results written to {args.output_path}")
 
 
 if __name__ == '__main__':
