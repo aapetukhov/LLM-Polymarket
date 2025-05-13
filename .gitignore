@@ -159,3 +159,5 @@ debug_deepseek.json
 polymarket_resolved_test_1000.json
 data/predictions/debug_deepseek.json
 test_1000.json
+
+broken_events.json
