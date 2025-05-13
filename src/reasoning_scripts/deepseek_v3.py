@@ -50,11 +50,11 @@ def parse_article_dt(dt_str, fmt="%Y%m%dT%H%M%SZ"):
     return datetime.strptime(dt_str, fmt)
 
 
-def compute_cutoff_dates(event, n=4):
+def compute_cutoff_dates(event, n=4, k_values=[3]):
     start = parse_dt(event["start_date"])
     end = parse_dt(min(event["end_date"], event.get("resolution_time", event["end_date"])))
     delta = end - start - timedelta(seconds=1)
-    return {k: start + delta * (k / n) for k in [3, 4]}
+    return {k: start + delta * (k / n) for k in k_values}
 
 
 def build_event_prompt(event, cutoff):
@@ -157,26 +157,31 @@ def query_llm(prompt, event_id):
 
 
 
-def evaluate_event(event):
+def evaluate_event(event, k_values=[3, 4]):
     results = []
-    cutoffs = compute_cutoff_dates(event)
-
+    cutoffs = compute_cutoff_dates(event=event, n=4, k_values=k_values)
     for name, cutoff in cutoffs.items():
         prompt, num_articles = build_event_prompt(event, cutoff)
         resp = query_llm(prompt, event["id"])
-        parsed = resp.get("output_parsed", {}) or {}
+        output_parsed = resp.get("output_parsed", {}) or {}
         entry = {
             "event_id": event["id"],
             "experiment": name,
             "pred_date": cutoff.strftime("%Y%m%d%H%M%S"),
-            "probability_yes": parsed.get("probability_yes"),
-            "justification": parsed.get("justification"),
+            "probability_yes": output_parsed.get("probability_yes"),
+            "justification": output_parsed.get("justification"),
             "num_articles": num_articles,
         }
         if resp.get("raw_response") and isinstance(resp["raw_response"], dict):
             entry["usage"] = resp["raw_response"].get("usage")
+        
+        # in case of error, add the error message to the entry
         if resp.get("error"):
             entry["error"] = resp["error"]
+            # in case of schema parse error, add the parsed output
+            # cause i will process it manually later :)
+            if resp["error"] == "schema_parse_error":
+                entry["output_parsed"] = resp["output_parsed"]
             print(
                 f"\033[91m[Error] Event {event['id']} | {name}:\033[0m {resp['error']}"
             )
@@ -229,7 +234,11 @@ def main():
     try:
         for event in tqdm(events, desc="Processing events"):
             try:
-                preds = evaluate_event(event)
+                if isinstance(event, list):
+                    event, k_values = event[0], event[1]
+                else:
+                    k_values = [3, 4]
+                preds = evaluate_event(event, k_values=k_values)
                 results.append({
                     "event_id": event.get("id"),
                     "title": event.get("title"),
@@ -237,14 +246,15 @@ def main():
                     "start_date": event.get("start_date"),
                     "end_date": event.get("end_date"),
                     "resolution_time": event.get("resolution_time"),
+                    "outcome_prices": event.get("outcome_prices"),
                     "predictions": preds
                 })
             except Exception as e:
                 print(f"\033[91m[Event {event.get('id')}] Evaluation failed:\033[0m \033[93m{type(e).__name__}\033[0m - {str(e)}")
                 results.append({"event_id": event.get("id"), "error": str(e)})
-            finally:
-                with open(args.output_path, 'w', encoding='utf-8') as out_f:
-                    json.dump(results, out_f, ensure_ascii=False, indent=2)
+            # finally:
+            #     with open(args.output_path, 'w', encoding='utf-8') as out_f:
+            #         json.dump(results, out_f, ensure_ascii=False, indent=2)
 
             if len(results) % 100 == 0:
                 with open(args.output_path, 'w', encoding='utf-8') as out_f:
