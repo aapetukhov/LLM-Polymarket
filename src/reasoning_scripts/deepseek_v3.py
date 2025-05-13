@@ -13,6 +13,7 @@ import requests
 load_dotenv()
 DEBUG = True
 TOP_K = 15
+K_VALUES = [3, 4]
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_API_BASE_URL", "https://openrouter.ai/api/v1")
@@ -237,7 +238,8 @@ def main():
                 if isinstance(event, list):
                     event, k_values = event[0], event[1]
                 else:
-                    k_values = [3, 4]
+                    # TODO: REMEMBER IT IS ALSO HERE!!!
+                    k_values = K_VALUES
                 preds = evaluate_event(event, k_values=k_values)
                 results.append({
                     "event_id": event.get("id"),
