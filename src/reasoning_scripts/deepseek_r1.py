@@ -12,7 +12,7 @@ import requests
 
 load_dotenv()
 DEBUG = True
-TOP_K = 15
+TOP_K = 10
 K_VALUES = [4]
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
