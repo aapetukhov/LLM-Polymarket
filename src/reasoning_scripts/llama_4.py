@@ -1,5 +1,3 @@
-# TODO: make it reusable for other models
-# like Gemini and other high quality yet cheap models
 import re
 import os
 import sys
