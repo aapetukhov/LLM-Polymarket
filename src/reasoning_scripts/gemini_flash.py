@@ -116,15 +116,15 @@ def query_llm(prompt, event_id):
         "model": MODEL_NAME,
         "messages": [{"role": "user", "content": prompt}],
         "response_format": {
-            "type": "json_schema",
-            "json_schema": {"schema": SCHEMA, "strict": True},
-            "required": ["justification", "probability_yes"]
+            "type": "json_object",
+            # "json_schema": {"schema": SCHEMA, "strict": True},
+            # "required": ["justification", "probability_yes"]
         },
         "temperature": 0.0,
         "max_output_tokens": 1024,
         "logprobs": True,
         "top_logprobs": 5,
-        "provider": {"only": ["Vertex Non-Thinking", "AI Studio Non-Thinking"], "require_parameters": False}
+        # "provider": {"only": ["Vertex Non-Thinking", "AI Studio Non-Thinking"], "require_parameters": False}
     }
 
     try:
