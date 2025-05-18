@@ -74,32 +74,23 @@ Question: {event["title"].strip()}
 Description and resolution conditions: {event["description"].strip()}
 Date range: {start_str} to {end_str}
 
-Use the following reasoning framework to structure your forecast:
-1. Compare this event to similar past events. Estimate a base rate: how often do such outcomes occur?
-2. Identify key facts and evidence in the news that support or challenge possible outcomes.
-3. Incorporate recent developments or shifts. What has changed over time?
-4. Consider past predictions for similar questions. What went right or wrong and why?
-5. Clarify what is actually being asked. Disambiguate if needed.
-6. Who has influence over the outcome? What are their incentives and constraints?
-7. What legal, institutional, or cultural rules might shape the outcome?
-8. Include alternative viewpoints. What might an opposing forecaster argue?
-9. Could any unlikely but high-impact events drastically shift the situation?
+REASONING STEPS:
+1. Write down any additional relevant information that is not included above. This should be specific facts that you already know the answer to, rather than information that needs to be looked up.
+2. Analyze the evidence in the articles.
+3. Determine whether they suggest the event is likely to happen.
+4. Estimate the probability (0–100) that the outcome is "Yes".
+5. Justify your estimate with 1–2 clear sentences.
 
 
 NEWS ARTICLES:
 {articles_text}
 
-
-Use the following reasoning framework to structure your forecast:
-1. Compare this event to similar past events. Estimate a base rate: how often do such outcomes occur?
-2. Identify key facts and evidence in the news that support or challenge possible outcomes.
-3. Incorporate recent developments or shifts. What has changed over time?
-4. Consider past predictions for similar questions. What went right or wrong and why?
-5. Clarify what is actually being asked. Disambiguate if needed.
-6. Who has influence over the outcome? What are their incentives and constraints?
-7. What legal, institutional, or cultural rules might shape the outcome?
-8. Include alternative viewpoints. What might an opposing forecaster argue?
-9. Could any unlikely but high-impact events drastically shift the situation?
+REASONING STEPS:
+1. Write down any additional relevant information that is not included above. This should be specific facts that you already know the answer to, rather than information that needs to be looked up.
+2. Analyze the evidence in the articles.
+3. Determine whether they suggest the event is likely to happen.
+4. Estimate the probability (0–100) that the outcome is "Yes".
+5. Justify your estimate with 1–2 clear sentences.
 
 
 RESPONSE FORMAT (JSON):
