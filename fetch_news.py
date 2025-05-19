@@ -28,8 +28,8 @@ from src.gdelt import GDELTRetriever
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 
-load_dotenv()
 
+load_dotenv()
 
 
 def parse_article(url):
