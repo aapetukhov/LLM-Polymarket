@@ -127,7 +127,24 @@ class GammaMarketClient:
                 events: list[PolymarketEvent] = []
                 for market_event_obj in data:
                     events.append(self.parse_pydantic_event(market_event_obj))
+                    print(response.status_codde)
                 return events
+        else:
+            raise Exception()
+        
+    def get_event(
+            self, id=None, local_file_path=None
+    ):
+        if id is None:
+            raise ValueError("Event ID must be provided")
+
+        response = httpx.get(f"{self.gamma_events_endpoint}/{id}")
+        if response.status_code == 200:
+            data = response.json()
+            if local_file_path is not None:
+                with open(local_file_path, "w+") as out_file:
+                    json.dump(data, out_file)
+            return self.parse_pydantic_event(data)
         else:
             raise Exception()
 
