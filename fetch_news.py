@@ -9,7 +9,6 @@ The script is designed to be run from the command line and takes two arguments: 
 import os
 import re
 import json
-import requests
 import argparse
 from tqdm import tqdm
 from datetime import datetime, timedelta
@@ -17,12 +16,9 @@ from newspaper import Article
 
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.output_parsers import StructuredOutputParser, ResponseSchema
-from langchain.chains.llm import LLMChain
 from langchain.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.runnables import RunnableSequence
 
-from src.polymarket.gamma import GammaMarketClient
 from src.gdelt import GDELTRetriever
 
 from dotenv import load_dotenv
