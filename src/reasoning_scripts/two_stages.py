@@ -18,17 +18,6 @@ API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_API_BASE_URL", "https://openrouter.ai/api/v1")
 MODEL_NAME = "deepseek/deepseek-r1"
 
-
-SCHEMA = {
-    "type": "object",
-    "properties": {
-        "probability_yes": {"type": "integer", "description": "Estimated probability (0-100) that the event will resolve as 'Yes'."},
-        "justification": {"type": "string", "description": "Justification based on the provided news context."}
-    },
-    "required": ["probability_yes", "justification"],
-    "additionalProperties": False
-}
-
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
