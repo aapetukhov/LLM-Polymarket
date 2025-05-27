@@ -164,6 +164,8 @@ broken_events.json
 broken_events_parsed.json
 debug_r1.json
 
+debug_*.json
+
 testing_new.json
 
 testing_articles.json
