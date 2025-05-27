@@ -1,4 +1,3 @@
-# TODO: finish two stages prompt
 import re
 import os
 import sys
@@ -17,6 +16,17 @@ K_VALUES = [3]
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_API_BASE_URL", "https://openrouter.ai/api/v1")
 MODEL_NAME = "deepseek/deepseek-r1"
+
+
+SCHEMA = {
+    "type": "object",
+    "properties": {
+        "probability_yes": {"type": "integer", "description": "Estimated probability (0-100) that the event will resolve as 'Yes'."},
+        "justification": {"type": "string", "description": "Justification based on the provided news context."}
+    },
+    "required": ["probability_yes", "justification"],
+    "additionalProperties": False
+}
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
@@ -46,27 +56,48 @@ def compute_cutoff_dates(event, n=4, k_values=K_VALUES):
     return {k: start + delta * (k / n) for k in k_values}
 
 
-def build_event_prompt(event, cutoff):
+def build_base_rate_prompt(event):
+    start = readable_date(event["start_date"])
+    end = readable_date(event["end_date"])
+    return f"""
+You are an expert geopolitical forecaster. First, provide only the base rate probability (outside view) that the event resolves as "Yes".
+
+EVENT:
+Question: {event["title"].strip()}
+Description: {event["description"].strip()}
+Date range: {start} to {end}
+
+RESPONSE FORMAT (JSON):
+{{
+  "probability_yes": <integer 0-100>
+}}
+""".strip()
+
+
+def build_inside_view_prompt(event, cutoff, base_rate):
+    cutoff_str = cutoff.strftime("%B %d, %Y, %H:%M")
     filtered = [a for a in event["articles"] if a.get("score", 0) > -3 and parse_article_dt(a["date"]) <= cutoff]
     articles = filtered[:TOP_K]
     articles_text = "\n\n".join([
         f"[{i+1}] TITLE: {a.get('title','').strip()}\nDATE: {a.get('date','').strip()}\nTEXT: {a.get('text','').strip()}"
         for i, a in enumerate(articles)
     ])
-    start_str = readable_date(event["start_date"])
-    end_str = readable_date(event["end_date"])
-    prompt = f"""
-You are an expert geopolitical forecaster. Estimate the probability that the event resolves as "Yes".
-Drawing from your experience and knowledge, evaluate historical data and trends to inform your forecasts, understanding that past events are not always perfect indicators of the future. Your primary objective is to achieve the utmost accuracy in these predictions.
-Identify reference classes of past similar events. Estimate the base rate of the event in consideration.
+    return f"""
+You are an expert geopolitical forecaster. You already have a base rate (outside view) of {base_rate}%.
+Now analyze the news articles and update your estimate (inside view) or leave it unchanged.
+
+EVENT:
+Question: {event["title"].strip()}
+
+NEWS ARTICLES (cutoff {cutoff_str}):
+{articles_text}
 
 RESPONSE FORMAT (JSON):
 {{
-  "justification": "<explanation>",
   "probability_yes": <integer 0-100>,
+  "justification": "<explanation>"
 }}
 """.strip()
-    return prompt, len(articles)
 
 
 def query_llm(prompt, event_id):
@@ -82,7 +113,7 @@ def query_llm(prompt, event_id):
         "max_output_tokens": 512,
         # "logprobs": True,
         # "top_logprobs": 5,
-        "provider": {"only": ["DeepInfra", "inference.net", "Lambda"], "require_parameters": True}
+        "provider": {"only": ["DeepInfra", "inference.net", "Lambda"], "require_parameters": False}
     }
 
     try:
@@ -118,42 +149,27 @@ def evaluate_event(event, k_values=K_VALUES):
     results = []
     cutoffs = compute_cutoff_dates(event=event, n=4, k_values=k_values)
     for name, cutoff in cutoffs.items():
-        prompt, num_articles = build_event_prompt(event, cutoff)
-        resp = query_llm(prompt, event["id"])
-        output_parsed = resp.get("output_parsed", {}) or {}
+        base_prompt = build_base_rate_prompt(event)
+        base_resp = query_llm(base_prompt, event["id"])
+        base_reasoning = base_resp.get("reasoning", "")
+        base_parsed = base_resp.get("output_parsed", {}) or base_resp
+        base_rate = base_parsed.get("probability_yes", base_parsed)
+
+        inside_prompt = build_inside_view_prompt(event, cutoff, base_rate)
+        inside_resp = query_llm(inside_prompt, event["id"])
+        inside_parsed = inside_resp.get("output_parsed", {}) or {}
+
         entry = {
             "event_id": event["id"],
             "experiment": name,
             "pred_date": cutoff.strftime("%Y%m%d%H%M%S"),
-            "probability_yes": output_parsed.get("probability_yes"),
-            "justification": output_parsed.get("justification"),
-            "reasoning": resp.get("reasoning", output_parsed.get("reasoning", "")),
-            "num_articles": num_articles,
+            "base_rate": base_rate,
+            "base_reasoning": base_reasoning,
+            "probability_yes": inside_parsed.get("probability_yes", inside_parsed),
+            "justification": inside_parsed.get("justification", inside_resp["reasoning"]),
+            "num_articles": len(filtered := [a for a in event["articles"] if a.get("score",0)>-3 and parse_article_dt(a["date"])<=cutoff][:TOP_K])
         }
-        if resp.get("raw_response") and isinstance(resp["raw_response"], dict):
-            entry["usage"] = resp["raw_response"].get("usage")
-        
-        # in case of error, add the error message to the entry
-        if resp.get("error"):
-            entry["error"] = resp["error"]
-            # in case of schema parse error, add the parsed output
-            # cause i will process it manually later :)
-            if resp["error"] == "schema_parse_error":
-                entry["output_parsed"] = resp["output_parsed"]
-            print(
-                f"\033[91m[Error] Event {event['id']} | {name}:\033[0m {resp['error']}"
-            )
-            print()
-        else:
-            if DEBUG:
-                print(
-                    f"\033[94m[Event {event['id']} | {name}]\033[0m "
-                    f"\033[92m{entry['probability_yes']}% yes\033[0m - "
-                    f"\033[93m{entry['justification']}\033[0m"
-                )
-                print()
         results.append(entry)
-
     return results
 
 
@@ -190,10 +206,6 @@ def main():
             except Exception as e:
                 print(f"\033[91m[Event {event.get('id')}] Evaluation failed:\033[0m \033[93m{type(e).__name__}\033[0m - {str(e)}")
                 results.append({"event_id": event.get("id"), "error": str(e)})
-            # finally:
-            #     with open(args.output_path, 'w', encoding='utf-8') as out_f:
-            #         json.dump(results, out_f, ensure_ascii=False, indent=2)
-
             if len(results) % 100 == 0:
                 with open(args.output_path, 'w', encoding='utf-8') as out_f:
                     json.dump(results, out_f, ensure_ascii=False, indent=2)
