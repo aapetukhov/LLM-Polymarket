@@ -47,7 +47,6 @@ def compute_cutoff_dates(event, n=4, k_values=K_VALUES):
 
 
 def build_event_prompt(event, cutoff):
-    cutoff_str = cutoff.strftime("%B %d, %Y, %H:%M")
     filtered = [a for a in event["articles"] if a.get("score", 0) > -3 and parse_article_dt(a["date"]) <= cutoff]
     articles = filtered[:TOP_K]
     articles_text = "\n\n".join([
@@ -58,31 +57,8 @@ def build_event_prompt(event, cutoff):
     end_str = readable_date(event["end_date"])
     prompt = f"""
 You are an expert geopolitical forecaster. Estimate the probability that the event resolves as "Yes".
-
-EVENT:
-Question: {event["title"].strip()}
-Description and resolution conditions: {event["description"].strip()}
-Date range: {start_str} to {end_str}
-
-REASONING STEPS:
-1. Write down any additional relevant information that is not included above. This should be specific facts that you already know the answer to, rather than information that needs to be looked up.
-2. Analyze the evidence in the articles.
-3. Determine whether they suggest the event is likely to happen.
-4. Estimate the probability (0–100) that the outcome is "Yes".
-5. Justify your estimate with 1–2 clear sentences.
-
-
-NEWS ARTICLES:
-{articles_text}
-
-
-REASONING STEPS:
-1. Write down any additional relevant information that is not included above. This should be specific facts that you already know the answer to, rather than information that needs to be looked up.
-2. Analyze the evidence in the articles.
-3. Determine whether they suggest the event is likely to happen.
-4. Estimate the probability (0–100) that the outcome is "Yes".
-5. Justify your estimate with 1–2 clear sentences.
-
+Drawing from your experience and knowledge, evaluate historical data and trends to inform your forecasts, understanding that past events are not always perfect indicators of the future. Your primary objective is to achieve the utmost accuracy in these predictions.
+Identify reference classes of past similar events. Estimate the base rate of the event in consideration.
 
 RESPONSE FORMAT (JSON):
 {{

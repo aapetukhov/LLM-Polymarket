@@ -192,27 +192,6 @@ def evaluate_event(event, k_values=K_VALUES):
     return results
 
 
-def process_events(events):
-    output = []
-    for e in tqdm(events, desc="Processing events"):
-        try:
-            preds = evaluate_event(e)
-            output.append({
-                "event_id": e["id"],
-                "title": e["title"],
-                "description": e["description"],
-                "start_date": e["start_date"],
-                "end_date": e["end_date"],
-                "resolution_time": e.get("resolution_time"),
-                "predictions": preds
-            })
-        except Exception as ex:
-            if DEBUG:
-                print(f"Error on event {e.get('id')}: {ex}")
-            output.append({"event_id": e.get("id"), "error": str(ex)})
-    return output
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", required=True)
