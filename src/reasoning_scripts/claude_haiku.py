@@ -226,9 +226,6 @@ def main():
             except Exception as e:
                 print(f"\033[91m[Event {event.get('id')}] Evaluation failed:\033[0m \033[93m{type(e).__name__}\033[0m - {str(e)}")
                 results.append({"event_id": event.get("id"), "error": str(e)})
-            # finally:
-            #     with open(args.output_path, 'w', encoding='utf-8') as out_f:
-
             if len(results) % 100 == 0:
                 with open(args.output_path, 'w', encoding='utf-8') as out_f:
                     json.dump(results, out_f, ensure_ascii=False, indent=2)
