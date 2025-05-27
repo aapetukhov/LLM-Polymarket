@@ -83,7 +83,7 @@ def build_inside_view_prompt(event, cutoff, base_rate):
         for i, a in enumerate(articles)
     ])
     return f"""
-You are an expert geopolitical forecaster. You already have a base rate (outside view) of {base_rate}%.
+You are an expert geopolitical forecaster. Estimate the probability that the event resolves as "Yes". You already have a base rate (outside view) of {base_rate}%.
 Now analyze the news articles and update your estimate (inside view) or leave it unchanged.
 
 EVENT:
