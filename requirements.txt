@@ -16,9 +16,9 @@ newspaper3k
 lxml_html_clean
 
 # langchain tools
-langchain
-langchain-openai
-langgraph
+# langchain
+# langchain-openai
+# langgraph
 pydantic
 pydantic-settings
 
