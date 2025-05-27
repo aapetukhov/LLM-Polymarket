@@ -228,7 +228,6 @@ def main():
                 results.append({"event_id": event.get("id"), "error": str(e)})
             # finally:
             #     with open(args.output_path, 'w', encoding='utf-8') as out_f:
-            #         json.dump(results, out_f, ensure_ascii=False, indent=2)
 
             if len(results) % 100 == 0:
                 with open(args.output_path, 'w', encoding='utf-8') as out_f:
