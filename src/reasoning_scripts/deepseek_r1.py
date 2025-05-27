@@ -11,7 +11,7 @@ import requests
 load_dotenv()
 DEBUG = True
 TOP_K = 10
-K_VALUES = [3]
+K_VALUES = [1, 2]
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_API_BASE_URL", "https://openrouter.ai/api/v1")
