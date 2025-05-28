@@ -117,15 +117,8 @@ def query_llm(prompt, event_id):
     payload = {
         "model": MODEL_NAME,
         "messages": [{"role": "user", "content": prompt}],
-        "response_format": {
-            "type": "json_schema",
-            "json_schema": {"schema": SCHEMA, "strict": True},
-            "required": ["justification", "probability_yes"]
-        },
         "temperature": 0.0,
         "max_output_tokens": 1024,
-        "logprobs": True,
-        "top_logprobs": 5,
         "provider": {"only": ["DeepInfra", "NovitaAI", "Nebius AI Studio"], "require_parameters": False}
     }
 
