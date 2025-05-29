@@ -169,3 +169,5 @@ debug_*.json
 testing_new.json
 
 testing_articles.json
+
+*.jsonl
