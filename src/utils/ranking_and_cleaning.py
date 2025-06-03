@@ -1,7 +1,6 @@
 import json
 from sentence_transformers import CrossEncoder
 from tqdm import tqdm
-import torch
 import os
 
 
