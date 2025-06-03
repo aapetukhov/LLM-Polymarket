@@ -173,3 +173,6 @@ testing_articles.json
 *.jsonl
 geo_and_categories.json
 predictions_df.csv
+
+1000_ids.json
+4000_ids.json
