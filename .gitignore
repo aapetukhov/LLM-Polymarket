@@ -176,3 +176,6 @@ predictions_df.csv
 
 1000_ids.json
 4000_ids.json
+
+data/*
+*.csv
