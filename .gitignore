@@ -179,3 +179,4 @@ predictions_df.csv
 
 data/*
 *.csv
+*.ipynb
