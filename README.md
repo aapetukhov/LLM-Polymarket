@@ -17,9 +17,9 @@
 ## Структура репозитория
 
 ```text
-├── Petukhov_Defense.pdf      ← презентация для защиты  
-├── LLM_polymarket.pdf        ← полный текст диплома  
-├── src/                      ← исходный код и ноутбуки  
+├── Petukhov_Defense.pdf
+├── LLM_polymarket.pdf 
+├── src/
 ├── data/  
 ├── requirements.txt  
-└── .flake8, .gitignore, …
+└── .flake8, .gitignore, ...
