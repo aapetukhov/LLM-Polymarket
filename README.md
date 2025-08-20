@@ -1,25 +1,28 @@
 # LLM-Polymarket
 
-Дипломная работа, посвященная вероятностному прогнозированию событий с платформы Polymarket на основе ансамбля LLM-моделей.
+BS Thesis on LLM-based probabilistic forecasting of Polymarket events. Various models, aggregation and calibration techniques are tested for this purpose, the results and conclusions are presented in text and presentation
 
 ---
 
-## Презентация защиты  
-[Открыть презентацию (Petukhov_Defense.pdf)](https://github.com/aapetukhov/LLM-Polymarket/blob/main/Petukhov_Defense.pdf)
+## Paper
+[Read the paper (LLM_polymarket.pdf)](https://github.com/aapetukhov/LLM-Polymarket/blob/main/LLM_polymarket.pdf)
 
 ---
 
-## Текст диплома  
-[Прочитать диплом (LLM_polymarket.pdf)](https://github.com/aapetukhov/LLM-Polymarket/blob/main/LLM_polymarket.pdf)
+## Presentation
+[View presentation (Petukhov_Defense.pdf)](https://github.com/aapetukhov/LLM-Polymarket/blob/main/Petukhov_Defense.pdf)
 
 ---
 
-## Структура репозитория
+
+---
+
+## Repo structure
 
 ```text
 ├── Petukhov_Defense.pdf
 ├── LLM_polymarket.pdf 
-├── src/
-├── data/  
+├── src/ # source files in python
+├── data/  # data samples
 ├── requirements.txt  
 └── .flake8, .gitignore, ...
